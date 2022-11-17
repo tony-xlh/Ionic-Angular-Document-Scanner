@@ -1,0 +1,7 @@
+{
+  "name": "Document Scanner",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
