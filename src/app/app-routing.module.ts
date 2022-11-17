@@ -11,6 +11,10 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'resultviewer',
+    loadChildren: () => import('./resultviewer/resultviewer.module').then( m => m.ResultviewerPageModule)
+  },
 ];
 
 @NgModule({
