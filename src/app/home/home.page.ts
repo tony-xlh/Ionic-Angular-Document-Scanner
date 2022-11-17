@@ -21,7 +21,7 @@ export class HomePage {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Base64
+      resultType: CameraResultType.DataUrl
     });
   
     if (image) {
