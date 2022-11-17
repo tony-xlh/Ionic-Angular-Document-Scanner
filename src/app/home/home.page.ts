@@ -8,5 +8,9 @@ import { Component } from '@angular/core';
 export class HomePage {
 
   constructor() {}
+  
+  scan(){
+    console.log("scan pressed");
+  }
 
 }
