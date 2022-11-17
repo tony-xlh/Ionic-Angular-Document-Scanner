@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { Camera, CameraResultType } from '@capacitor/camera';
 
 @Component({
@@ -8,7 +9,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
 })
 export class HomePage {
 
-  constructor() {}
+  constructor(private router: Router) {}
   
   scan(){
     console.log("scan pressed");
@@ -23,6 +24,16 @@ export class HomePage {
       resultType: CameraResultType.Base64
     });
   
-    console.log(image);
+    if (image) {
+      this.router.navigate(['/cropper'],{
+        state: {
+          image: image
+        }
+      });
+    }
   };
+
+
+
+
 }
