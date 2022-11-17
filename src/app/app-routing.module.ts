@@ -15,6 +15,10 @@ const routes: Routes = [
     path: 'resultviewer',
     loadChildren: () => import('./resultviewer/resultviewer.module').then( m => m.ResultviewerPageModule)
   },
+  {
+    path: 'cropper',
+    loadChildren: () => import('./cropper/cropper.module').then( m => m.CropperPageModule)
+  },
 ];
 
 @NgModule({
