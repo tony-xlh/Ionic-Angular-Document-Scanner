@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from "@angular/common";
 import { Router } from '@angular/router';
 import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
@@ -13,7 +14,7 @@ export class CropperPage implements OnInit {
   dataURL:string = "";
   viewBox:string = "0 0 1280 720";
   detectedQuadResult:DetectedQuadResult|undefined;
-  constructor(private router: Router) {}
+  constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
@@ -33,7 +34,6 @@ export class CropperPage implements OnInit {
           }
           img.src = image.dataUrl;
         }
-        console.log(image);
       }
     }
   }
@@ -58,4 +58,16 @@ export class CropperPage implements OnInit {
     return "";
   }
 
+  use(){
+    this.router.navigate(['/resultviewer'],{
+      state: {
+        detectedQuadResult: this.detectedQuadResult,
+        dataURL: this.dataURL
+      }
+    });
+  }
+
+  cancel(){
+    this.location.back();
+  }
 }
