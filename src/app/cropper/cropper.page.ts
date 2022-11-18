@@ -10,7 +10,9 @@ import { Photo } from '@capacitor/camera';
 export class CropperPage implements OnInit {
   dataURL:string = "";
   viewBox:string = "0 0 1280 720";
-  constructor(private router: Router) { 
+  constructor(private router: Router) {}
+
+  ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
     if (navigation) {
       const routeState = navigation.extras.state;
@@ -32,8 +34,8 @@ export class CropperPage implements OnInit {
     }
   }
 
-  ngOnInit() {
-
+  detect(){
+    
   }
 
 }
