@@ -1,10 +1,4 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Cropper</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
+<div class="cropper">
   <svg [attr.viewBox]="viewBox" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <image [attr.href]="dataURL"></image>
     <a *ngIf="detectedQuadResult">
@@ -18,4 +12,4 @@
       </polygon>
     </a>
   </svg>
-</ion-content>
+</div>
