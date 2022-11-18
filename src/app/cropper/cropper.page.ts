@@ -16,6 +16,7 @@ export class CropperPage implements OnInit {
   viewBox:string = "0 0 1280 720";
   detectedQuadResult:DetectedQuadResult|undefined;
   points:[Point,Point,Point,Point]|undefined;
+  selectedIndex: number = -1;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
@@ -90,6 +91,7 @@ export class CropperPage implements OnInit {
   onSVGMouseMoved(event:any) {
     console.log("moved");
     console.log(event);
+    this.moveSelectedCircle();
   }
 
   onSVGMouseUp(event:any) {
@@ -104,6 +106,19 @@ export class CropperPage implements OnInit {
 
   onRectMouseDown(index:number) {
     console.log("selected index: "+index);
+    this.selectedIndex = index;
+  }
+
+  onRectMouseUp(){
+    this.selectedIndex = -1;
+  }
+
+  moveSelectedCircle(){
+    if (this.selectedIndex != -1 && this.points) {
+      let selectedPoint = this.points[this.selectedIndex];
+      selectedPoint.x = 0;
+      selectedPoint.y = 0;
+    }
   }
 
   use(){
