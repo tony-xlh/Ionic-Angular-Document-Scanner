@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
+import { Point } from 'dynamsoft-camera-enhancer';
 
 @Component({
   selector: 'app-cropper',
@@ -14,6 +15,7 @@ export class CropperPage implements OnInit {
   dataURL:string = "";
   viewBox:string = "0 0 1280 720";
   detectedQuadResult:DetectedQuadResult|undefined;
+  points:[Point,Point,Point,Point]|undefined;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
@@ -43,6 +45,7 @@ export class CropperPage implements OnInit {
     if (results.length>0) {
       console.log(results);
       this.detectedQuadResult = results[0];
+      this.points = this.detectedQuadResult.location.points;
     }
   }
 
@@ -56,6 +59,51 @@ export class CropperPage implements OnInit {
       return pointsData;
     }
     return "";
+  }
+
+  getRectX(index:number,x:number,width:number) {
+    if (index == 0) {
+      x = x - width;
+    } else if (index == 1) {
+      x = x;
+    } else if (index == 2) {
+      x = x;
+    } else if (index == 3) {
+      x = x - width;
+    }
+    return x;
+  }
+
+  getRectY(index:number,y:number,height:number) {
+    if (index == 0) {
+      y = y - height;
+    } else if (index == 1) {
+      y = y - height;
+    } else if (index == 2) {
+      y = y;
+    } else if (index == 3) {
+      y = y;
+    }
+    return y;
+  }
+
+  onSVGMouseMoved(event:any) {
+    console.log("moved");
+    console.log(event);
+  }
+
+  onSVGMouseUp(event:any) {
+    console.log("up");
+    console.log(event);
+  }
+
+  onSVGMouseDown(event:any){
+    console.log("down");
+    console.log(event);
+  }
+
+  onRectMouseDown(index:number) {
+    console.log("selected index: "+index);
   }
 
   use(){

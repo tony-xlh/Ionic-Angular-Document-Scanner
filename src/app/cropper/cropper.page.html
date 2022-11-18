@@ -1,5 +1,12 @@
 <div class="cropper">
-  <svg [attr.viewBox]="viewBox" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <svg 
+    [attr.viewBox]="viewBox" 
+    version="1.1" 
+    xmlns="http://www.w3.org/2000/svg"
+    (mousemove)="onSVGMouseMoved($event)"
+    (mouseup)="onSVGMouseUp($event)"
+    (mousedown)="onSVGMouseDown($event)"
+  >
     <image [attr.href]="dataURL"></image>
     <a *ngIf="detectedQuadResult">
       <polygon
@@ -10,6 +17,18 @@
         opacity="0.3"
       >
       </polygon>
+      <rect *ngFor="let point of points; let i=index;"
+        draggable="true"
+        stroke="green"
+        stroke-width="2"
+        fill="rgba(0,255,0,.2)"
+        [attr.x]="getRectX(i, point.x, 20)"
+        [attr.y]="getRectY(i, point.y, 20)"
+        width="20"
+        height="20"
+        (mousedown)="onRectMouseDown(i)"
+      > 
+      </rect>
     </a>
   </svg>
   <div class="footer">
