@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +10,10 @@ import { Camera, CameraResultType } from '@capacitor/camera';
 })
 export class HomePage {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    DocumentNormalizer.initLicense({license:"DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="});
+    DocumentNormalizer.initialize();
+  }
   
   scan(){
     console.log("scan pressed");
