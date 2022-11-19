@@ -1,9 +1,11 @@
 <div class="cropper">
   <svg 
+    #svgElement
+    [style.width]="getSVGWidth(svgElement)"
     [attr.viewBox]="viewBox" 
     version="1.1" 
     xmlns="http://www.w3.org/2000/svg"
-    (mousemove)="onSVGMouseMoved($event)"
+    (mousemove)="onSVGMouseMoved($event, svgElement)"
     (mouseup)="onSVGMouseUp($event)"
     (mousedown)="onSVGMouseDown($event)"
   >

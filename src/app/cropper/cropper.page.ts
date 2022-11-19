@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from "@angular/common";
 import { Router } from '@angular/router';
 import { Photo } from '@capacitor/camera';
@@ -17,6 +17,8 @@ export class CropperPage implements OnInit {
   detectedQuadResult:DetectedQuadResult|undefined;
   points:[Point,Point,Point,Point]|undefined;
   selectedIndex: number = -1;
+  private imgWidth:number = 0;
+  private imgHeight:number = 0;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
@@ -31,6 +33,8 @@ export class CropperPage implements OnInit {
           img.onload = function(){
             if (image.dataUrl) {
               pThis.viewBox = "0 0 "+img.naturalWidth+" "+img.naturalHeight;
+              pThis.imgWidth = img.naturalWidth;
+              pThis.imgHeight = img.naturalHeight;
               pThis.dataURL = image.dataUrl;
               pThis.detect();
             }
@@ -39,6 +43,12 @@ export class CropperPage implements OnInit {
         }
       }
     }
+  }
+
+  getSVGWidth(svgElement:any){
+    let imgRatio = this.imgWidth/this.imgHeight;
+    let width = svgElement.clientHeight * imgRatio;
+    return width;
   }
 
   async detect(){
@@ -88,15 +98,16 @@ export class CropperPage implements OnInit {
     return y;
   }
 
-  onSVGMouseMoved(event:any) {
+  onSVGMouseMoved(event:any,svgElement:any) {
     console.log("moved");
     console.log(event);
-    this.moveSelectedCircle();
+    this.moveSelectedCircle(event,svgElement);
   }
 
   onSVGMouseUp(event:any) {
     console.log("up");
     console.log(event);
+    this.selectedIndex = -1;
   }
 
   onSVGMouseDown(event:any){
@@ -113,11 +124,20 @@ export class CropperPage implements OnInit {
     this.selectedIndex = -1;
   }
 
-  moveSelectedCircle(){
+  moveSelectedCircle(event:any, svgElement:any){
     if (this.selectedIndex != -1 && this.points) {
       let selectedPoint = this.points[this.selectedIndex];
-      selectedPoint.x = 0;
-      selectedPoint.y = 0;
+      let x = event.offsetX;
+      let y = event.offsetY;
+      
+      let percent = 1.0;
+      percent = this.imgWidth/svgElement.clientWidth;
+      console.log(this.imgWidth);
+      console.log(svgElement.clientWidth);
+      x = Math.floor(percent*x);
+      y = Math.floor(percent*y);
+      selectedPoint.x = x;
+      selectedPoint.y = y;
     }
   }
 
