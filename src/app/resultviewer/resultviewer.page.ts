@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-resultviewer',
@@ -30,7 +33,11 @@ export class ResultviewerPage implements OnInit {
   async normalize() {
     if (this.detectedQuadResult) {
       let normalizedImageResult = await DocumentNormalizer.normalize({source:this.dataURL,quad:this.detectedQuadResult.location});
-      this.normalizedImageDataURL = normalizedImageResult.result.data;
+      let data = normalizedImageResult.result.data;
+      if (!data.startsWith("data")) {
+        data = "data:image/jpeg;base64," + data;
+      }
+      this.normalizedImageDataURL = data;
     }
   }
 
@@ -49,13 +56,28 @@ export class ResultviewerPage implements OnInit {
   }
 
   async share(){
-    const blob = await (await fetch(this.normalizedImageDataURL)).blob();
-    const file = new File([blob], 'fileName.png', { type: blob.type });
-    navigator.share({
-      title: 'Hello',
-      text: 'Check out this image!',
-      files: [file],
-    })
+    if (Capacitor.isNativePlatform()) {
+      let fileName = "normalized.jpg";
+      let writingResult = await Filesystem.writeFile({
+        path: fileName,
+        data: this.normalizedImageDataURL,
+        directory: Directory.Cache
+      });
+      Share.share({
+        title: fileName,
+        text: fileName,
+        url: writingResult.uri,
+      });
+    } else {
+      const blob = await (await fetch(this.normalizedImageDataURL)).blob();
+      const file = new File([blob], 'fileName.png', { type: blob.type });
+      navigator.share({
+        title: 'Hello',
+        text: 'Check out this image!',
+        files: [file],
+      })
+    }
+   
   }
 
 }
