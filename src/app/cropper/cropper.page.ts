@@ -73,7 +73,7 @@ export class CropperPage implements OnInit {
   }
   
   getCornerWidth(){
-    let percent = 640/window.innerWidth;
+    let percent = 640/this.imgWidth;
     return 20/percent;
   }
 
