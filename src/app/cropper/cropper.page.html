@@ -7,10 +7,7 @@
     xmlns="http://www.w3.org/2000/svg"
     (mousemove)="onSVGMouseMoved($event, svgElement)"
     (mouseup)="onSVGMouseUp($event)"
-    (mousedown)="onSVGMouseDown($event)"
-    (touchmove)="onSVGMouseMoved($event, svgElement)"
-    (touchstart)="onSVGMouseDown($event)"
-    (touchend)="onSVGMouseUp($event)"
+    (touchmove)="onSVGTouchMoved($event, svgElement)"
   >
     <image [attr.href]="dataURL"></image>
     <a *ngIf="detectedQuadResult">
@@ -23,18 +20,18 @@
       >
       </polygon>
       <rect *ngFor="let point of points; let i=index;"
+        [class]="getClassNameForRect(i)"
         draggable="true"
         stroke="green"
-        stroke-width="2"
         fill="rgba(0,255,0,.2)"
         [attr.x]="getRectX(i, point.x)"
         [attr.y]="getRectY(i, point.y)"
         [attr.width]="getCornerWidth()"
         [attr.height]="getCornerWidth()"
-        (mousedown)="onRectMouseDown(i)"
-        (mouseup)="onRectMouseUp()"
-        (touchstart)="onRectMouseDown(i)"
-        (touchend)="onRectMouseUp()"
+        (mousedown)="onRectMouseDown(i, $event)"
+        (mouseup)="onRectMouseUp($event)"
+        (touchstart)="onRectTouchStart(i, $event)"
+        (touchend)="onRectTouchEnd($event)"
       > 
       </rect>
     </a>

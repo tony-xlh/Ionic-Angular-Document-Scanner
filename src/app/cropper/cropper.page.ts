@@ -19,6 +19,7 @@ export class CropperPage implements OnInit {
   selectedIndex: number = -1;
   private imgWidth:number = 0;
   private imgHeight:number = 0;
+  private useTouchEvent:boolean = false;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
@@ -105,30 +106,67 @@ export class CropperPage implements OnInit {
     return y;
   }
 
+  getClassNameForRect(i:number){
+    if (i === this.selectedIndex) {
+      return "cornerActive";
+    }else{
+      return "corner";
+    }
+  }
+
+  onSVGTouchMoved(event:any,svgElement:any) {
+    this.handleMoveEvent(event,svgElement);
+  }
+
   onSVGMouseMoved(event:any,svgElement:any) {
+    this.handleMoveEvent(event,svgElement);
+  }
+
+  handleMoveEvent(event:any,svgElement:any){
     console.log("moved");
     console.log(event);
+    if (this.useTouchEvent && !event.targetTouches){
+      return;
+    }
     this.moveSelectedCircle(event,svgElement);
   }
 
-  onSVGMouseUp(event:any) {
-    console.log("up");
-    console.log(event);
-    this.selectedIndex = -1;
+  onSVGMouseUp(event:any){
+    if (!this.useTouchEvent) {
+      this.selectedIndex = -1;
+    }
   }
 
-  onSVGMouseDown(event:any){
-    console.log("down");
-    console.log(event);
+  onRectMouseDown(index:number, event:any) {
+    this.handleDownOrStartEvent(index,event);
   }
 
-  onRectMouseDown(index:number) {
+  onRectTouchStart(index:number, event:any) {
+    this.handleDownOrStartEvent(index,event);
+  }
+
+  handleDownOrStartEvent(index:number, event:any){
     console.log("selected index: "+index);
+    console.log(event);
+    if (event.targetTouches) {
+      console.log("is touch event");
+      this.useTouchEvent = true;
+    }
     this.selectedIndex = index;
   }
 
-  onRectMouseUp(){
-    this.selectedIndex = -1;
+  onRectTouchEnd(event:any){
+    this.handleUpOrEndEvent();
+  }
+
+  onRectMouseUp(event:any){
+    this.handleUpOrEndEvent();
+  }
+
+  handleUpOrEndEvent(){
+    if (!this.useTouchEvent) {
+      this.selectedIndex = -1;
+    }
   }
 
   moveSelectedCircle(event:any, svgElement:any){
@@ -138,8 +176,11 @@ export class CropperPage implements OnInit {
       let y:number;
       if (event.targetTouches) {
         console.log("Event type: touch event");
-        x = event.targetTouches[0].clientX;
-        y = event.targetTouches[0].clientY;
+        let rect = event.target.getBoundingClientRect();
+        x = event.targetTouches[0].pageX - rect.left;
+        y = event.targetTouches[0].pageY - rect.top;
+        //x = event.targetTouches[0].clientX;
+        //y = event.targetTouches[0].clientY;
       }else{
         console.log("Event type: mouse event");
         x = event.offsetX;
