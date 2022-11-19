@@ -24,6 +24,7 @@
         [class]="getClassNameForRect(i)"
         draggable="true"
         stroke="green"
+        [attr.stroke-width]="getCornerStrokeWidth(i)"
         fill="rgba(0,255,0,.2)"
         [attr.x]="getRectX(i, point.x)"
         [attr.y]="getRectY(i, point.y)"

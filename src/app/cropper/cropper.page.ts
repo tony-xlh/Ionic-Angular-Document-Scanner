@@ -79,6 +79,15 @@ export class CropperPage implements OnInit {
     return 20/percent;
   }
 
+  getCornerStrokeWidth(i:number){
+    let percent = 640/this.imgWidth;
+    if (i === this.selectedIndex) {
+      return 5/percent;
+    }else{
+      return 2/percent;
+    }
+  }
+
   getRectX(index:number,x:number) {
     let width = this.getCornerWidth();
     if (index == 0) {
@@ -111,7 +120,7 @@ export class CropperPage implements OnInit {
     if (i === this.selectedIndex) {
       return "cornerActive";
     }else{
-      return "corner";
+      return "";
     }
   }
 
