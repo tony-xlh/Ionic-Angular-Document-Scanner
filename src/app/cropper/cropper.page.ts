@@ -134,8 +134,17 @@ export class CropperPage implements OnInit {
   moveSelectedCircle(event:any, svgElement:any){
     if (this.selectedIndex != -1 && this.points) {
       let selectedPoint = this.points[this.selectedIndex];
-      let x:number = event.offsetX;
-      let y:number = event.offsetY;
+      let x:number;
+      let y:number;
+      if (event.targetTouches) {
+        console.log("Event type: touch event");
+        x = event.targetTouches[0].clientX;
+        y = event.targetTouches[0].clientY;
+      }else{
+        console.log("Event type: mouse event");
+        x = event.offsetX;
+        y = event.offsetY;
+      }
       
       let percent = 1.0;
       percent = this.imgWidth/svgElement.clientWidth;
