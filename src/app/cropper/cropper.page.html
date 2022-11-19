@@ -7,6 +7,7 @@
     xmlns="http://www.w3.org/2000/svg"
     (mousemove)="onSVGMouseMoved($event, svgElement)"
     (mouseup)="onSVGMouseUp($event)"
+    (touchend)="onSVGTouchEnd($event)"
     (touchmove)="onSVGTouchMoved($event, svgElement)"
   >
     <image [attr.href]="dataURL"></image>

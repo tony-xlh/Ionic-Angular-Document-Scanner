@@ -17,6 +17,7 @@ export class CropperPage implements OnInit {
   detectedQuadResult:DetectedQuadResult|undefined;
   points:[Point,Point,Point,Point]|undefined;
   selectedIndex: number = -1;
+  private touching:boolean = false;
   private imgWidth:number = 0;
   private imgHeight:number = 0;
   private useTouchEvent:boolean = false;
@@ -128,6 +129,10 @@ export class CropperPage implements OnInit {
     if (this.useTouchEvent && !event.targetTouches){
       return;
     }
+    if (this.useTouchEvent && event.target.tagName === "rect") {
+      return;
+    }
+
     this.moveSelectedCircle(event,svgElement);
   }
 
@@ -137,11 +142,17 @@ export class CropperPage implements OnInit {
     }
   }
 
+  onSVGTouchEnd(event:any){
+    this.selectedIndex = -1;
+  }
+
+
   onRectMouseDown(index:number, event:any) {
     this.handleDownOrStartEvent(index,event);
   }
 
   onRectTouchStart(index:number, event:any) {
+    this.touching = true;
     this.handleDownOrStartEvent(index,event);
   }
 
