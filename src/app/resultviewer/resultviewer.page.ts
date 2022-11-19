@@ -48,4 +48,14 @@ export class ResultviewerPage implements OnInit {
     await this.normalize();
   }
 
+  async share(){
+    const blob = await (await fetch(this.normalizedImageDataURL)).blob();
+    const file = new File([blob], 'fileName.png', { type: blob.type });
+    navigator.share({
+      title: 'Hello',
+      text: 'Check out this image!',
+      files: [file],
+    })
+  }
+
 }
