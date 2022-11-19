@@ -71,8 +71,14 @@ export class CropperPage implements OnInit {
     }
     return "";
   }
+  
+  getCornerWidth(){
+    let percent = 640/window.innerWidth;
+    return 20/percent;
+  }
 
-  getRectX(index:number,x:number,width:number) {
+  getRectX(index:number,x:number) {
+    let width = this.getCornerWidth();
     if (index == 0) {
       x = x - width;
     } else if (index == 1) {
@@ -85,7 +91,8 @@ export class CropperPage implements OnInit {
     return x;
   }
 
-  getRectY(index:number,y:number,height:number) {
+  getRectY(index:number,y:number) {
+    let height = this.getCornerWidth();
     if (index == 0) {
       y = y - height;
     } else if (index == 1) {
