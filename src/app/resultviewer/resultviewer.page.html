@@ -5,5 +5,20 @@
 </ion-header>
 
 <ion-content>
-  <img class="normalizedImage" alt="normalizedImage" [src]="normalizedImageDataURL" />
+  <ion-list>
+    <ion-item>
+      <ion-select (ionChange)="colorModeChanged($event)" placeholder="Select color mode:">
+        <ion-select-option value="binary">Binary</ion-select-option>
+        <ion-select-option value="gray">Gray</ion-select-option>
+        <ion-select-option value="color">Color</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <img class="normalizedImage" alt="normalizedImage" [src]="normalizedImageDataURL" />
+    </ion-item>
+    <ion-item>
+      <ion-button expand="full">Share</ion-button>
+    </ion-item>
+  </ion-list>
+  
 </ion-content>
