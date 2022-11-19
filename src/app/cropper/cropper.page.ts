@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
-import { Point } from 'dynamsoft-camera-enhancer';
+import { Point } from "dynamsoft-document-normalizer/dist/types/interface/point";
 
 @Component({
   selector: 'app-cropper',
@@ -127,8 +127,8 @@ export class CropperPage implements OnInit {
   moveSelectedCircle(event:any, svgElement:any){
     if (this.selectedIndex != -1 && this.points) {
       let selectedPoint = this.points[this.selectedIndex];
-      let x = event.offsetX;
-      let y = event.offsetY;
+      let x:number = event.offsetX;
+      let y:number = event.offsetY;
       
       let percent = 1.0;
       percent = this.imgWidth/svgElement.clientWidth;
@@ -138,6 +138,15 @@ export class CropperPage implements OnInit {
       y = Math.floor(percent*y);
       selectedPoint.x = x;
       selectedPoint.y = y;
+      if (this.detectedQuadResult) {
+        let point:Point = {
+          coordinate:[x,y],
+          x:x,
+          y:y
+        }
+        this.detectedQuadResult.location.points[this.selectedIndex] = point;
+      }
+      
     }
   }
 
