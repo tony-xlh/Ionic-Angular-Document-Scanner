@@ -10,6 +10,7 @@
     (mousemove)="drag($event,svgElement)"
     (touchstart)="startDrag($event,svgElement)"
     (touchmove)="drag($event,svgElement)"
+    (touchend)="endDrag()"
   >
     <image [attr.href]="dataURL"></image>
     <a *ngIf="detectedQuadResult">
