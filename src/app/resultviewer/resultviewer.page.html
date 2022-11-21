@@ -16,12 +16,8 @@
     <ion-item>
       <img class="normalizedImage" alt="normalizedImage" [src]="normalizedImageDataURL" />
     </ion-item>
-    <ion-item>
-      <ion-button *ngIf="shareSupported" (click)="share()" >Share</ion-button>
-    </ion-item>
-    <ion-item>
-      <ion-button *ngIf="!isNative" (click)="download()" >Download</ion-button>
-    </ion-item>
+    <ion-button expand="full" *ngIf="shareSupported" (click)="share()" >Share</ion-button>
+    <ion-button expand="full" *ngIf="!isNative" (click)="download()" >Download</ion-button>
   </ion-list>
   
 </ion-content>
