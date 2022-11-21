@@ -17,10 +17,9 @@ export class CropperPage implements OnInit {
   detectedQuadResult:DetectedQuadResult|undefined;
   points:[Point,Point,Point,Point]|undefined;
   selectedIndex: number = -1;
-  private touching:boolean = false;
+  offset:{x:number,y:number}|undefined;
   private imgWidth:number = 0;
   private imgHeight:number = 0;
-  private useTouchEvent:boolean = false;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
@@ -89,31 +88,27 @@ export class CropperPage implements OnInit {
   }
 
   getRectX(index:number,x:number) {
+    return this.getOffsetX(index) + x;
+  }
+
+  getOffsetX(index:number) {
     let width = this.getCornerWidth();
-    if (index == 0) {
-      x = x - width;
-    } else if (index == 1) {
-      x = x;
-    } else if (index == 2) {
-      x = x;
-    } else if (index == 3) {
-      x = x - width;
+    if (index === 0 || index === 3) {
+      return - width;
     }
-    return x;
+    return 0;
   }
 
   getRectY(index:number,y:number) {
+    return this.getOffsetY(index) + y;
+  }
+
+  getOffsetY(index:number) {
     let height = this.getCornerWidth();
-    if (index == 0) {
-      y = y - height;
-    } else if (index == 1) {
-      y = y - height;
-    } else if (index == 2) {
-      y = y;
-    } else if (index == 3) {
-      y = y;
+    if (index === 0 || index === 1) {
+      return - height;
     }
-    return y;
+    return 0;
   }
 
   getClassNameForRect(i:number){
@@ -124,104 +119,68 @@ export class CropperPage implements OnInit {
     }
   }
 
-  onSVGTouchMoved(event:any,svgElement:any) {
-    this.handleMoveEvent(event,svgElement);
+  onRectMouseDown(index:number,event:any) {
+    this.selectedIndex = index;
   }
 
-  onSVGMouseMoved(event:any,svgElement:any) {
-    this.handleMoveEvent(event,svgElement);
-  }
-
-  handleMoveEvent(event:any,svgElement:any){
-    console.log("moved");
-    console.log(event);
-    if (this.useTouchEvent && !event.targetTouches){
-      return;
-    }
-    if (this.useTouchEvent && event.target.tagName === "rect") {
-      return;
-    }
-
-    this.moveSelectedCircle(event,svgElement);
-  }
-
-  onSVGMouseUp(event:any){
-    if (!this.useTouchEvent) {
-      this.selectedIndex = -1;
-    }
-  }
-
-  onSVGTouchEnd(event:any){
+  onRectMouseUp(event:any) {
     this.selectedIndex = -1;
   }
 
-
-  onRectMouseDown(index:number, event:any) {
-    this.handleDownOrStartEvent(index,event);
-  }
-
-  onRectTouchStart(index:number, event:any) {
-    this.touching = true;
-    this.handleDownOrStartEvent(index,event);
-  }
-
-  handleDownOrStartEvent(index:number, event:any){
-    console.log("selected index: "+index);
-    console.log(event);
-    if (event.targetTouches) {
-      console.log("is touch event");
-      this.useTouchEvent = true;
-    }
+  onRectTouchStart(index:number,event:any) {
     this.selectedIndex = index;
   }
 
   onRectTouchEnd(event:any){
-    this.handleUpOrEndEvent();
+    this.selectedIndex = -1;
   }
 
-  onRectMouseUp(event:any){
-    this.handleUpOrEndEvent();
-  }
-
-  handleUpOrEndEvent(){
-    if (!this.useTouchEvent) {
-      this.selectedIndex = -1;
+  startDrag(event:any,svgElement:any){
+    if (this.points && this.selectedIndex != -1) {
+      this.offset = this.getMousePosition(event,svgElement);
+      let x = this.points[this.selectedIndex].x;
+      let y = this.points[this.selectedIndex].y;
+      this.offset.x -= x;
+      this.offset.y -= y;
     }
   }
 
-  moveSelectedCircle(event:any, svgElement:any){
-    if (this.selectedIndex != -1 && this.points) {
-      let selectedPoint = this.points[this.selectedIndex];
-      let x:number;
-      let y:number;
-      if (event.targetTouches) {
-        console.log("Event type: touch event");
-        let rect = event.target.getBoundingClientRect();
-        x = event.targetTouches[0].pageX - rect.left;
-        y = event.targetTouches[0].pageY - rect.top;
-      }else{
-        console.log("Event type: mouse event");
-        x = event.offsetX;
-        y = event.offsetY;
-      }
-      
-      let percent = 1.0;
-      percent = this.imgWidth/svgElement.clientWidth;
-      console.log(this.imgWidth);
-      console.log(svgElement.clientWidth);
-      x = Math.floor(percent*x);
-      y = Math.floor(percent*y);
-      selectedPoint.x = x;
-      selectedPoint.y = y;
+  endDrag(){
+    this.selectedIndex = -1;
+  }
+
+  drag(event:any,svgElement:any){
+    if (this.points && this.selectedIndex != -1 && this.offset) {
+      event.preventDefault();
+      let coord = this.getMousePosition(event,svgElement);
+      let point = this.points[this.selectedIndex];
+      point.x = (coord.x - this.offset.x) - this.getOffsetX(this.selectedIndex);
+      point.y = (coord.y - this.offset.y) - this.getOffsetY(this.selectedIndex);
       if (this.detectedQuadResult) {
-        let point:Point = {
-          coordinate:[x,y],
-          x:x,
-          y:y
+        let p:Point = {
+          coordinate:[point.x,point.y],
+          x:point.x,
+          y:point.y
         }
         this.detectedQuadResult.location.points[this.selectedIndex] = point;
       }
-      
+    }
+  }
+
+  getMousePosition(event:any,svg:any) {
+    let CTM = svg.getScreenCTM();
+    if (event.targetTouches) {
+      let x = event.targetTouches[0].clientX;
+      let y = event.targetTouches[0].clientY;
+      return {
+        x: (x - CTM.e) / CTM.a,
+        y: (y - CTM.f) / CTM.d
+      };
+    }else{
+      return {
+        x: (event.clientX - CTM.e) / CTM.a,
+        y: (event.clientY - CTM.f) / CTM.d
+      };
     }
   }
 

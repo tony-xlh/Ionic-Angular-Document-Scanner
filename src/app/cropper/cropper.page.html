@@ -5,10 +5,11 @@
     [attr.viewBox]="viewBox" 
     version="1.1" 
     xmlns="http://www.w3.org/2000/svg"
-    (mousemove)="onSVGMouseMoved($event, svgElement)"
-    (mouseup)="onSVGMouseUp($event)"
-    (touchend)="onSVGTouchEnd($event)"
-    (touchmove)="onSVGTouchMoved($event, svgElement)"
+    (mousedown)="startDrag($event,svgElement)"
+    (mouseup)="endDrag()"
+    (mousemove)="drag($event,svgElement)"
+    (touchstart)="startDrag($event,svgElement)"
+    (touchmove)="drag($event,svgElement)"
   >
     <image [attr.href]="dataURL"></image>
     <a *ngIf="detectedQuadResult">
