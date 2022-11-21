@@ -22,7 +22,9 @@ export class ResultviewerPage implements OnInit {
   ngOnInit() {
     this.isNative = Capacitor.isNativePlatform();
     if (!this.isNative) {
-      this.shareSupported = "share" in navigator;
+      if (!("share" in navigator)) {
+        this.shareSupported = false;
+      }
     }
     const navigation = this.router.getCurrentNavigation();
     if (navigation) {
