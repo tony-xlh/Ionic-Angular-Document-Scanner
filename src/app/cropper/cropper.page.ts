@@ -20,6 +20,7 @@ export class CropperPage implements OnInit {
   offset:{x:number,y:number}|undefined;
   private imgWidth:number = 0;
   private imgHeight:number = 0;
+  private usingTouchEvent:boolean = false;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
@@ -111,31 +112,36 @@ export class CropperPage implements OnInit {
     return 0;
   }
 
-  getClassNameForRect(i:number){
-    if (i === this.selectedIndex) {
-      return "cornerActive";
-    }else{
-      return "";
+  onRectMouseDown(index:number,event:any) {
+    if (!this.usingTouchEvent) {
+      console.log(event);
+      this.selectedIndex = index;
     }
   }
 
-  onRectMouseDown(index:number,event:any) {
-    this.selectedIndex = index;
-  }
-
   onRectMouseUp(event:any) {
-    this.selectedIndex = -1;
+    if (!this.usingTouchEvent) {
+      console.log(event);
+      this.selectedIndex = -1;
+    }
   }
 
   onRectTouchStart(index:number,event:any) {
+    this.usingTouchEvent = true;
+    console.log(event);
     this.selectedIndex = index;
   }
 
   onRectTouchEnd(event:any){
+    console.log(event);
     this.selectedIndex = -1;
   }
 
   startDrag(event:any,svgElement:any){
+    if (this.usingTouchEvent && !event.targetTouches) {
+      return;
+    }
+    console.log(event);
     if (this.points && this.selectedIndex != -1) {
       this.offset = this.getMousePosition(event,svgElement);
       let x = this.points[this.selectedIndex].x;
@@ -145,11 +151,18 @@ export class CropperPage implements OnInit {
     }
   }
 
-  endDrag(){
+  endDrag(event:any){
+    if (this.usingTouchEvent && !event.targetTouches) {
+      return;
+    }
     this.selectedIndex = -1;
   }
 
   drag(event:any,svgElement:any){
+    if (this.usingTouchEvent && !event.targetTouches) {
+      return;
+    }
+    console.log(event);
     if (this.points && this.selectedIndex != -1 && this.offset) {
       event.preventDefault();
       let coord = this.getMousePosition(event,svgElement);
