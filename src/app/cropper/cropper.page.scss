@@ -5,6 +5,12 @@
   background: black;
 }
 
+.hint {
+  position:absolute;
+  margin: 2em;
+  color: white;
+}
+
 .cropper rect{
   cursor: move;
 }
@@ -47,10 +53,12 @@
   width: 2.5em;
   height: 2.5em;
   pointer-events: all;
+  cursor:pointer;
 }
 
 .accept-cancel img {
   width: 2.5em;
   height: 2.5em;
   pointer-events: all;
+  cursor:pointer;
 }

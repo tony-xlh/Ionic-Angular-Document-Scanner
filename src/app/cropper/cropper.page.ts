@@ -20,10 +20,12 @@ export class CropperPage implements OnInit {
   offset:{x:number,y:number}|undefined;
   private imgWidth:number = 0;
   private imgHeight:number = 0;
+  isTouchDevice:boolean = false;
   private usingTouchEvent:boolean = false;
   constructor(private router: Router,private location: Location) {}
 
   ngOnInit() {
+    this.isTouchDevice = 'ontouchstart' in document.documentElement;
     const navigation = this.router.getCurrentNavigation();
     if (navigation) {
       const routeState = navigation.extras.state;

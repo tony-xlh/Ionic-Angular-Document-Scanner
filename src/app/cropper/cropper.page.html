@@ -37,6 +37,9 @@
       </rect>
     </a>
   </svg>
+  <div *ngIf="isTouchDevice" class="hint">
+    Select one rectangular and then drag the screen to adjust the polygon.
+  </div>
   <div class="footer">
     <section class="items">
       <div class="item accept-cancel" (click)="cancel()">
