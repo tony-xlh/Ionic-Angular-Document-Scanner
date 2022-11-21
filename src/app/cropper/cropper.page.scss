@@ -5,6 +5,10 @@
   background: black;
 }
 
+.cropper rect{
+  cursor: move;
+}
+
 .footer {
   position: absolute;
   left: 0;

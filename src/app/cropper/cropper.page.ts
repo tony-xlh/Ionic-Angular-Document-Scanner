@@ -199,8 +199,6 @@ export class CropperPage implements OnInit {
         let rect = event.target.getBoundingClientRect();
         x = event.targetTouches[0].pageX - rect.left;
         y = event.targetTouches[0].pageY - rect.top;
-        //x = event.targetTouches[0].clientX;
-        //y = event.targetTouches[0].clientY;
       }else{
         console.log("Event type: mouse event");
         x = event.offsetX;
