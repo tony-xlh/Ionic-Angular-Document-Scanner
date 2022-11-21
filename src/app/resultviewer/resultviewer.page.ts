@@ -14,10 +14,16 @@ import { Share } from '@capacitor/share';
 export class ResultviewerPage implements OnInit {
   dataURL:string = "";
   normalizedImageDataURL:string = "";
+  shareSupported:boolean = true;
+  isNative:boolean = false;
   private detectedQuadResult:DetectedQuadResult|undefined;
   constructor(private router: Router) { }
 
   ngOnInit() {
+    this.isNative = Capacitor.isNativePlatform();
+    if (!this.isNative) {
+      this.shareSupported = "share" in navigator;
+    }
     const navigation = this.router.getCurrentNavigation();
     if (navigation) {
       const routeState = navigation.extras.state;
@@ -56,7 +62,7 @@ export class ResultviewerPage implements OnInit {
   }
 
   async share(){
-    if (Capacitor.isNativePlatform()) {
+    if (this.isNative) {
       let fileName = "normalized.jpg";
       let writingResult = await Filesystem.writeFile({
         path: fileName,
@@ -70,14 +76,23 @@ export class ResultviewerPage implements OnInit {
       });
     } else {
       const blob = await (await fetch(this.normalizedImageDataURL)).blob();
-      const file = new File([blob], 'fileName.png', { type: blob.type });
+      const file = new File([blob], 'normalized.png', { type: blob.type });
       navigator.share({
         title: 'Hello',
         text: 'Check out this image!',
         files: [file],
       })
     }
-   
   }
 
+  async download(){
+    const blob = await (await fetch(this.normalizedImageDataURL)).blob();
+    const imageURL = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = imageURL;
+    link.download = 'normalized.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
