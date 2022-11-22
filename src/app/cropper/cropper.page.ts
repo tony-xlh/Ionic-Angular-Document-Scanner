@@ -152,7 +152,7 @@ export class CropperPage implements OnInit {
   }
 
   startDrag(event:any,svgElement:any){
-    if (this.usingTouchEvent && !event.targetTouches) {
+    if (this.usingTouchEvent && !event.targetTouches) { //if touch events are supported, do not execuate mouse events.
       return;
     }
     console.log(event);
@@ -166,14 +166,14 @@ export class CropperPage implements OnInit {
   }
 
   endDrag(event:any){
-    if (this.usingTouchEvent && !event.targetTouches) {
+    if (this.usingTouchEvent && !event.targetTouches) {  //if touch events are supported, do not execuate mouse events.
       return;
     }
     this.selectedIndex = -1;
   }
 
   drag(event:any,svgElement:any){
-    if (this.usingTouchEvent && !event.targetTouches) {
+    if (this.usingTouchEvent && !event.targetTouches) {  //if touch events are supported, do not execuate mouse events.
       return;
     }
     console.log(event);
@@ -195,7 +195,7 @@ export class CropperPage implements OnInit {
 
   getMousePosition(event:any,svg:any) {
     let CTM = svg.getScreenCTM();
-    if (event.targetTouches) {
+    if (event.targetTouches) { //if it is a touch event
       let x = event.targetTouches[0].clientX;
       let y = event.targetTouches[0].clientY;
       return {
