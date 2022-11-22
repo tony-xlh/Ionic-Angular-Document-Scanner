@@ -90,7 +90,7 @@ export class CropperPage implements OnInit {
   
   getCornerSize(){
     let percent = 640/this.imgWidth;
-    return 20/percent;
+    return 30/percent;
   }
 
   getCornerStrokeWidth(i:number){
