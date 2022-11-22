@@ -141,7 +141,7 @@ export class CropperPage implements OnInit {
   }
 
   onRectTouchStart(index:number,event:any) {
-    this.usingTouchEvent = true;
+    this.usingTouchEvent = true; //Touch events are triggered before mouse events. We can use this to prevent executing mouse events.
     console.log(event);
     this.selectedIndex = index;
   }
