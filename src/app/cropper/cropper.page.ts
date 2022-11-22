@@ -63,13 +63,17 @@ export class CropperPage implements OnInit {
       this.detectedQuadResult = results[0];
       this.points = this.detectedQuadResult.location.points;
     }else {
-      const toast = await this.toastController.create({
-        message: 'No documents detected.',
-        duration: 1500,
-        position: 'top'
-      });
-      await toast.present();
+      this.presentToast();
     }
+  }
+
+  async presentToast(){
+    const toast = await this.toastController.create({
+      message: 'No documents detected.',
+      duration: 1500,
+      position: 'top'
+    });
+    await toast.present();
   }
 
   getPointsData(){
@@ -208,15 +212,19 @@ export class CropperPage implements OnInit {
   }
 
   use(){
-    this.router.navigate(['/resultviewer'],{
-      state: {
-        detectedQuadResult: this.detectedQuadResult,
-        dataURL: this.dataURL
-      }
-    });
+    if (this.detectedQuadResult) {
+      this.router.navigate(['/resultviewer'],{
+        state: {
+          detectedQuadResult: this.detectedQuadResult,
+          dataURL: this.dataURL
+        }
+      });
+    }else{
+      this.presentToast();
+    }
   }
 
   cancel(){
-    this.location.back();
+    this.router.navigate(['/home']);
   }
 }
