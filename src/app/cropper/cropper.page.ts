@@ -157,7 +157,7 @@ export class CropperPage implements OnInit {
     }
     console.log(event);
     if (this.points && this.selectedIndex != -1) {
-      this.offset = this.getMousePosition(event,svgElement);
+      this.offset = this.getMousePosition(event,svgElement); //We need this info so that whether we start dragging the rectangular in the center or in the corner will not affect the result.
       let x = this.points[this.selectedIndex].x;
       let y = this.points[this.selectedIndex].y;
       this.offset.x -= x;
