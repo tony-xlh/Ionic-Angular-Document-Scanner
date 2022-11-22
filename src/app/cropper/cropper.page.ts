@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Location } from "@angular/common";
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
@@ -22,7 +23,7 @@ export class CropperPage implements OnInit {
   private imgHeight:number = 0;
   isTouchDevice:boolean = false;
   private usingTouchEvent:boolean = false;
-  constructor(private router: Router,private location: Location) {}
+  constructor(private router: Router,private location: Location,private toastController: ToastController) {}
 
   ngOnInit() {
     this.isTouchDevice = 'ontouchstart' in document.documentElement;
@@ -61,6 +62,13 @@ export class CropperPage implements OnInit {
       console.log(results);
       this.detectedQuadResult = results[0];
       this.points = this.detectedQuadResult.location.points;
+    }else {
+      const toast = await this.toastController.create({
+        message: 'No documents detected.',
+        duration: 1500,
+        position: 'top'
+      });
+      await toast.present();
     }
   }
 
