@@ -181,15 +181,14 @@ export class CropperPage implements OnInit {
       event.preventDefault();
       let coord = this.getMousePosition(event,svgElement);
       let point = this.points[this.selectedIndex];
-      point.x = (coord.x - this.offset.x)// - this.getOffsetX(this.selectedIndex);
-      point.y = (coord.y - this.offset.y)// - this.getOffsetY(this.selectedIndex);
+      point.x = coord.x - this.offset.x;
+      point.y = coord.y - this.offset.y;
       if (this.detectedQuadResult) {
-        let p:Point = {
-          coordinate:[point.x,point.y],
-          x:point.x,
-          y:point.y
+        this.detectedQuadResult.location.points[this.selectedIndex].x = point.x;
+        this.detectedQuadResult.location.points[this.selectedIndex].y = point.y;
+        if (this.detectedQuadResult.location.points[this.selectedIndex].coordinate) {
+          this.detectedQuadResult.location.points[this.selectedIndex].coordinate = [point.x,point.y];
         }
-        this.detectedQuadResult.location.points[this.selectedIndex] = p;
       }
     }
   }
