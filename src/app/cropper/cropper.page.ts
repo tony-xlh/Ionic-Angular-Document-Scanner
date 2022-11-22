@@ -88,12 +88,12 @@ export class CropperPage implements OnInit {
     return "";
   }
   
-  getCornerSize(){
+  getRectSize(){
     let percent = 640/this.imgWidth;
-    return 30/percent;
+    return 30/percent; //30 works fine when the width is 640. Scale it if the image has a different width
   }
 
-  getCornerStrokeWidth(i:number){
+  getRectStrokeWidth(i:number){
     let percent = 640/this.imgWidth;
     if (i === this.selectedIndex) {
       return 5/percent;
@@ -107,7 +107,7 @@ export class CropperPage implements OnInit {
   }
 
   getOffsetX(index:number) {
-    let width = this.getCornerSize();
+    let width = this.getRectSize();
     if (index === 0 || index === 3) {
       return - width;
     }
@@ -119,7 +119,7 @@ export class CropperPage implements OnInit {
   }
 
   getOffsetY(index:number) {
-    let height = this.getCornerSize();
+    let height = this.getRectSize();
     if (index === 0 || index === 1) {
       return - height;
     }
