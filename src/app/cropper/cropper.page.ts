@@ -193,6 +193,7 @@ export class CropperPage implements OnInit {
     }
   }
 
+  //Convert the screen coordinates to the SVG's coordinates from https://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
   getMousePosition(event:any,svg:any) {
     let CTM = svg.getScreenCTM();
     if (event.targetTouches) { //if it is a touch event
