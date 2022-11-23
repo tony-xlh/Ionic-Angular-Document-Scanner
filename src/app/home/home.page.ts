@@ -36,11 +36,11 @@ export class HomePage {
     });
   
     if (image) {
-      if ('ontouchstart' in document.documentElement && !Capacitor.isNativePlatform()) {
-        if (image.dataUrl) {
-          image.dataUrl = await this.scaleDownImageForWeb(image.dataUrl);
-        }
-      }
+      //if ('ontouchstart' in document.documentElement && !Capacitor.isNativePlatform()) {
+      //  if (image.dataUrl) {
+      //    image.dataUrl = await this.scaleDownImageForWeb(image.dataUrl);
+      //  }
+      //}
       this.router.navigate(['/cropper'],{
         state: {
           image: image
