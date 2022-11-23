@@ -61,10 +61,10 @@ export class HomePage {
           let targetHeight;
           let ratio = img.naturalHeight/img.naturalWidth;
           if (img.naturalHeight>img.naturalWidth) {
-            targetHeight = 320;
+            targetHeight = 1920;
             targetWidth = targetHeight/ratio;
           }else {
-            targetWidth = 320;
+            targetWidth = 1920;
             targetHeight = targetWidth*ratio;
           }
           canvas.width = targetWidth;
