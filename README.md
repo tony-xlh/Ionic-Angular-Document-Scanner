@@ -4,7 +4,7 @@ Ionic Angular Document Scanner demo using the [capacitor-plugin-dynamsoft-docume
 
 [Online demo](https://gentle-licorice-00c7d7.netlify.app/)
 
-[Demo video](https://user-images.githubusercontent.com/5462205/203210577-a144dc49-5c96-455a-8688-09ae935c9c05.MP4)
+[Demo video](https://user-images.githubusercontent.com/5462205/203277301-7582d697-07e3-499b-8e3f-6032c4c07b72.mp4)
 
 ### Supported Platforms
 
