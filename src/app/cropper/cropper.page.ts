@@ -6,6 +6,7 @@ import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
 import { Point } from "dynamsoft-document-normalizer/dist/types/interface/point";
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-cropper',
@@ -58,13 +59,21 @@ export class CropperPage implements OnInit {
   }
 
   async detect(){
-    let results = (await DocumentNormalizer.detect({source:this.dataURL})).results;
-    if (results.length>0) {
-      console.log(results);
-      this.detectedQuadResult = results[0];
-      this.points = this.detectedQuadResult.location.points;
-    }else {
-      this.presentToast();
+    let source;
+    if (Capacitor.isNativePlatform()) {
+      source = this.dataURL;
+    }else{
+      source = this.img;
+    }
+    if (source) {
+      let results = (await DocumentNormalizer.detect({source:source})).results;
+      if (results.length>0) {
+        console.log(results);
+        this.detectedQuadResult = results[0];
+        this.points = this.detectedQuadResult.location.points;
+      }else {
+        this.presentToast();
+      }
     }
   }
 
@@ -216,7 +225,7 @@ export class CropperPage implements OnInit {
     this.router.navigate(['/resultviewer'],{
       state: {
         detectedQuadResult: this.detectedQuadResult,
-        dataURL: this.dataURL
+        dataURL: this.dataURL,
       }
     });
   }

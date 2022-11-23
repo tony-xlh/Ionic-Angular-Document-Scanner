@@ -17,6 +17,7 @@ export class ResultviewerPage implements OnInit {
   shareSupported:boolean = true;
   isNative:boolean = false;
   private detectedQuadResult:DetectedQuadResult|undefined;
+  private img:HTMLImageElement|undefined;
   constructor(private router: Router) { }
 
   ngOnInit() {
@@ -33,22 +34,40 @@ export class ResultviewerPage implements OnInit {
       if (routeState) {
         this.dataURL = routeState["dataURL"];  
         this.detectedQuadResult = routeState["detectedQuadResult"];
-        this.normalize();
+        if (this.isNative) {
+          this.normalize();
+        }else{
+          this.img = new Image();
+          let pThis = this;
+          this.img.onload = function(){
+            pThis.normalize();
+          }
+          this.img.src = this.dataURL;
+        }
       }
     }
   }
 
   async normalize() {
-    if (this.detectedQuadResult) {
-      let normalizedImageResult = await DocumentNormalizer.normalize({source:this.dataURL,quad:this.detectedQuadResult.location});
-      let data = normalizedImageResult.result.data;
-      if (!data.startsWith("data")) {
-        data = "data:image/jpeg;base64," + data;
-      }
-      this.normalizedImageDataURL = data;
+    let source;
+    if (this.isNative) {
+      source = this.dataURL;
     }else{
-      this.normalizedImageDataURL = this.dataURL;
+      source = this.img;
     }
+    if (source) {
+      if (this.detectedQuadResult) {
+        let normalizedImageResult = await DocumentNormalizer.normalize({source:source,quad:this.detectedQuadResult.location});
+        let data = normalizedImageResult.result.data;
+        if (!data.startsWith("data")) {
+          data = "data:image/jpeg;base64," + data;
+        }
+        this.normalizedImageDataURL = data;
+      }else{
+        this.normalizedImageDataURL = this.dataURL;
+      }
+    }
+    
   }
 
   async colorModeChanged(event:any){
