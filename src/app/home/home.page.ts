@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Camera, CameraResultType } from '@capacitor/camera';
+import { Camera, CameraResultType, Photo } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 
@@ -36,6 +36,11 @@ export class HomePage {
     });
   
     if (image) {
+      if ('ontouchstart' in document.documentElement && !Capacitor.isNativePlatform()) {
+        if (image.dataUrl) {
+          image.dataUrl = await this.scaleDownImageForWeb(image.dataUrl);
+        }
+      }
       this.router.navigate(['/cropper'],{
         state: {
           image: image
@@ -44,7 +49,39 @@ export class HomePage {
     }
   };
 
-
+  scaleDownImageForWeb(dataURL:string):Promise<string>{
+    console.log("regenerate DataURL");
+    return new Promise(function (resolve, reject) {
+      try {
+        let img = document.createElement("img");
+        img.onload = function() {
+          let canvas = document.createElement("canvas");
+          let ctx = canvas.getContext("2d");
+          let targetWidth;
+          let targetHeight;
+          let ratio = img.naturalHeight/img.naturalWidth;
+          if (img.naturalHeight>img.naturalWidth) {
+            targetHeight = 320;
+            targetWidth = targetHeight/ratio;
+          }else {
+            targetWidth = 320;
+            targetHeight = targetWidth*ratio;
+          }
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          if (ctx) {
+            ctx.drawImage(img,0,0,targetWidth,targetHeight);
+          }
+          let scaled = canvas.toDataURL('image/jpeg');
+          resolve(scaled);
+        };
+        img.src = dataURL;
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+  
 
 
 }
