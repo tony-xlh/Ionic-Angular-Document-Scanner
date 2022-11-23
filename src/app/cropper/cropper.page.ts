@@ -22,7 +22,6 @@ export class CropperPage implements OnInit {
   offset:{x:number,y:number}|undefined;
   private imgWidth:number = 0;
   private imgHeight:number = 0;
-  private img:HTMLImageElement|undefined;
   isTouchDevice:boolean = false;
   private usingTouchEvent:boolean = false;
   constructor(private router: Router,private location: Location,private toastController: ToastController) {}
@@ -36,17 +35,17 @@ export class CropperPage implements OnInit {
         const image:Photo = routeState['image'];
         if (image.dataUrl) {
           const pThis = this;
-          this.img = new Image();
-          this.img.onload = function(){
-            if (image.dataUrl && pThis.img) {
-              pThis.viewBox = "0 0 "+pThis.img.naturalWidth+" "+pThis.img.naturalHeight;
-              pThis.imgWidth = pThis.img.naturalWidth;
-              pThis.imgHeight = pThis.img.naturalHeight;
+          let img = new Image();
+          img.onload = function(){
+            if (image.dataUrl) {
+              pThis.viewBox = "0 0 "+img.naturalWidth+" "+img.naturalHeight;
+              pThis.imgWidth = img.naturalWidth;
+              pThis.imgHeight = img.naturalHeight;
               pThis.dataURL = image.dataUrl;
               pThis.detect();
             }
           }
-          this.img.src = image.dataUrl;
+          img.src = image.dataUrl;
         }
       }
     }
@@ -59,22 +58,15 @@ export class CropperPage implements OnInit {
   }
 
   async detect(){
-    let source;
-    if (Capacitor.isNativePlatform()) {
-      source = this.dataURL;
-    }else{
-      source = this.img;
+    let results = (await DocumentNormalizer.detect({source:this.dataURL})).results;
+    if (results.length>0) {
+      console.log(results);
+      this.detectedQuadResult = results[0];
+      this.points = this.detectedQuadResult.location.points;
+    }else {
+      this.presentToast();
     }
-    if (source) {
-      let results = (await DocumentNormalizer.detect({source:source})).results;
-      if (results.length>0) {
-        console.log(results);
-        this.detectedQuadResult = results[0];
-        this.points = this.detectedQuadResult.location.points;
-      }else {
-        this.presentToast();
-      }
-    }
+
   }
 
   async presentToast(){
