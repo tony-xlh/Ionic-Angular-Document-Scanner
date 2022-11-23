@@ -7,6 +7,7 @@ import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normaliz
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
 import { Point } from "dynamsoft-document-normalizer/dist/types/interface/point";
 import { Capacitor } from '@capacitor/core';
+import { getCanvasFromDataURL } from '../utils';
 
 @Component({
   selector: 'app-cropper',
@@ -58,7 +59,13 @@ export class CropperPage implements OnInit {
   }
 
   async detect(){
-    let results = (await DocumentNormalizer.detect({source:this.dataURL})).results;
+    let source;
+    if (Capacitor.isNativePlatform()) {
+      source = this.dataURL;
+    }else{
+      source = await getCanvasFromDataURL(this.dataURL)
+    }
+    let results = (await DocumentNormalizer.detect({source:source})).results;
     if (results.length>0) {
       console.log(results);
       this.detectedQuadResult = results[0];

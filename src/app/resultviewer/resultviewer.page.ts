@@ -5,6 +5,7 @@ import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normaliz
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { getCanvasFromDataURL } from '../utils';
 
 @Component({
   selector: 'app-resultviewer',
@@ -41,7 +42,13 @@ export class ResultviewerPage implements OnInit {
 
   async normalize() {
     if (this.detectedQuadResult) {
-      let normalizedImageResult = await DocumentNormalizer.normalize({source:this.dataURL,quad:this.detectedQuadResult.location});
+      let source;
+      if (Capacitor.isNativePlatform()) {
+        source = this.dataURL;
+      }else{
+        source = await getCanvasFromDataURL(this.dataURL)
+      }
+      let normalizedImageResult = await DocumentNormalizer.normalize({source:source,quad:this.detectedQuadResult.location});
       let data = normalizedImageResult.result.data;
       if (!data.startsWith("data")) {
         data = "data:image/jpeg;base64," + data;
