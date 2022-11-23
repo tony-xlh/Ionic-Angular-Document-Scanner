@@ -212,16 +212,12 @@ export class CropperPage implements OnInit {
   }
 
   use(){
-    if (this.detectedQuadResult) {
-      this.router.navigate(['/resultviewer'],{
-        state: {
-          detectedQuadResult: this.detectedQuadResult,
-          dataURL: this.dataURL
-        }
-      });
-    }else{
-      this.presentToast();
-    }
+    this.router.navigate(['/resultviewer'],{
+      state: {
+        detectedQuadResult: this.detectedQuadResult,
+        dataURL: this.dataURL
+      }
+    });
   }
 
   cancel(){

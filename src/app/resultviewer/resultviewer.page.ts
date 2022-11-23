@@ -46,6 +46,8 @@ export class ResultviewerPage implements OnInit {
         data = "data:image/jpeg;base64," + data;
       }
       this.normalizedImageDataURL = data;
+    }else{
+      this.normalizedImageDataURL = this.dataURL;
     }
   }
 
