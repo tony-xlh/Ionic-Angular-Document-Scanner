@@ -214,7 +214,7 @@ export class CropperPage implements OnInit {
   use(){
     this.router.navigate(['/resultviewer'],{
       state: {
-        detectedQuadResult: this.detectedQuadResult,
+        detectedQuadResult: undefined,
         dataURL: this.dataURL
       }
     });
