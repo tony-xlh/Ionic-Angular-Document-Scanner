@@ -35,7 +35,6 @@ export class ResultviewerPage implements OnInit {
         this.dataURL = routeState["dataURL"];  
         this.detectedQuadResult = routeState["detectedQuadResult"];
         this.normalize();
-       
       }
     }
   }

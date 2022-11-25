@@ -6,6 +6,7 @@ import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
 import { Point } from "dynamsoft-document-normalizer/dist/types/interface/point";
+import { Quadrilateral } from "dynamsoft-document-normalizer/dist/types/interface/quadrilateral";
 import { Capacitor } from '@capacitor/core';
 import { getCanvasFromDataURL } from '../utils';
 
@@ -71,14 +72,33 @@ export class CropperPage implements OnInit {
       this.detectedQuadResult = results[0];
       this.points = this.detectedQuadResult.location.points;
     }else {
-      this.presentToast();
+      await this.presentToast();
+      let location:Quadrilateral = {points:[
+        this.getPoint(50,50),
+        this.getPoint(100,50),
+        this.getPoint(100,100),
+        this.getPoint(50,100)]};
+      let defaultQuad:DetectedQuadResult = {
+        location:location,
+        confidenceAsDocumentBoundary:90
+      }
+      this.detectedQuadResult = defaultQuad;
+      this.points = this.detectedQuadResult.location.points;
     }
+  }
 
+  getPoint(x:number,y:number) {
+    let p:Point = {
+      x:x,
+      y:y,
+      coordinate:[x,y]
+    }
+    return p;
   }
 
   async presentToast(){
     const toast = await this.toastController.create({
-      message: 'No documents detected.',
+      message: 'No documents detected. Create a default box.',
       duration: 1500,
       position: 'top'
     });
