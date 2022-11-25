@@ -88,6 +88,10 @@ export class CropperPage implements OnInit {
   }
 
   getPoint(x:number,y:number) {
+    let xPercent = 640/this.imgWidth;
+    let yPercent = 480/this.imgHeight;
+    x = x/xPercent;
+    y = y/yPercent;
     let p:Point = {
       x:x,
       y:y,
