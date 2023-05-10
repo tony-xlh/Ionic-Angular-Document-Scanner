@@ -94,8 +94,7 @@ export class CropperPage implements OnInit {
     y = y/yPercent;
     let p:Point = {
       x:x,
-      y:y,
-      coordinate:[x,y]
+      y:y
     }
     return p;
   }
@@ -219,9 +218,6 @@ export class CropperPage implements OnInit {
       if (this.detectedQuadResult) {
         this.detectedQuadResult.location.points[this.selectedIndex].x = point.x;
         this.detectedQuadResult.location.points[this.selectedIndex].y = point.y;
-        if (this.detectedQuadResult.location.points[this.selectedIndex].coordinate) {
-          this.detectedQuadResult.location.points[this.selectedIndex].coordinate = [point.x,point.y];
-        }
       }
     }
   }
