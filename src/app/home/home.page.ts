@@ -10,21 +10,35 @@ import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normaliz
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-
+  initialized = false;
   constructor(private router: Router) {
-    let license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="; //public trial
-    //if (Capacitor.isNativePlatform()) {
-    //  license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwMjI3NzYzLVRYbE5iMkpwYkdWUWNtOXFYMlJrYmciLCJvcmdhbml6YXRpb25JRCI6IjEwMDIyNzc2MyIsImNoZWNrQ29kZSI6MTM0ODY2MDUyMn0=";
-    //}else{
-    //  license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwMjI3NzYzLVRYbFhaV0pRY205cVgyUmtiZyIsIm9yZ2FuaXphdGlvbklEIjoiMTAwMjI3NzYzIiwiY2hlY2tDb2RlIjotMTY2NDUwOTcxMH0=";
-    //}
-    DocumentNormalizer.initLicense({license:license});
-    DocumentNormalizer.initialize();
+    this.initialize();
+  }
+
+  async initialize(){
+    try {
+      let license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="; //public trial
+      //if (Capacitor.isNativePlatform()) {
+      //  license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwMjI3NzYzLVRYbE5iMkpwYkdWUWNtOXFYMlJrYmciLCJvcmdhbml6YXRpb25JRCI6IjEwMDIyNzc2MyIsImNoZWNrQ29kZSI6MTM0ODY2MDUyMn0=";
+      //}else{
+      //  license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwMjI3NzYzLVRYbFhaV0pRY205cVgyUmtiZyIsIm9yZ2FuaXphdGlvbklEIjoiMTAwMjI3NzYzIiwiY2hlY2tDb2RlIjotMTY2NDUwOTcxMH0=";
+      //}
+      await DocumentNormalizer.initLicense({license:license});
+      await DocumentNormalizer.initialize();
+      this.initialized = true;
+    } catch (error) {
+      alert(error);
+    }
   }
   
   scan(){
     console.log("scan pressed");
-    this.takePicture();
+    if (this.initialized) {
+      this.takePicture();
+    }else{
+      alert("Please wait for initialization.");
+    }
+    
   }
 
 

@@ -12,5 +12,5 @@
       <ion-title size="large">Home</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-button expand="full" (click)="scan()">Scan Document</ion-button>
+  <ion-button expand="full" (click)="scan()">{{initialized ? "Scan Document" : "Initializing"}}</ion-button>
 </ion-content>
