@@ -81,6 +81,7 @@ export class CropperPage implements OnInit {
     }
     let results = (await DocumentNormalizer.detect({source:source})).results;
     if (results.length === 0) {
+      console.log("adapt DDN for white background");
       await this.useTemplateForWhiteBackground();
       results = (await DocumentNormalizer.detect({source:source})).results;
     }
@@ -156,11 +157,8 @@ export class CropperPage implements OnInit {
   }
 
   getOffsetX(index:number) {
-    let width = this.getRectSize();
-    if (index === 0 || index === 3) {
-      return - width;
-    }
-    return 0;
+    let width = this.getRectSize()/2;
+    return - width;
   }
 
   getRectY(index:number,y:number) {
@@ -168,11 +166,8 @@ export class CropperPage implements OnInit {
   }
 
   getOffsetY(index:number) {
-    let height = this.getRectSize();
-    if (index === 0 || index === 1) {
-      return - height;
-    }
-    return 0;
+    let height = this.getRectSize()/2;
+    return - height;
   }
 
   onRectMouseDown(index:number,event:any) {
