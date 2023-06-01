@@ -214,4 +214,7 @@ export class ScannerPage implements OnInit {
     return width;
   }
 
+  close(){
+    this.router.navigate(['/home']);
+  }
 }
