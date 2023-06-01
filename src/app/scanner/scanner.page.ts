@@ -199,4 +199,11 @@ export class ScannerPage implements OnInit {
     }
     this.viewBox = "0 0 "+width+" "+height;
   }
+
+  getSVGWidth(svgElement:any){
+    let imgRatio = this.frameWidth/this.frameHeight;
+    let width = svgElement.clientHeight * imgRatio;
+    return width;
+  }
+
 }

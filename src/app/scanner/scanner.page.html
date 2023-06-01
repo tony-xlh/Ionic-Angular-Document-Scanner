@@ -1,9 +1,12 @@
 <div class="scanner">
   <svg 
+    #svgElement
     [attr.viewBox]="viewBox" 
+    [style.width]="getSVGWidth(svgElement)"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
+    <image *ngIf="showConfirmation" [attr.href]="photoTaken"></image>
     <polygon
       *ngFor="let result of detectionResults"
       [attr.points]="getPointsData(result)"
