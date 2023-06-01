@@ -23,11 +23,14 @@ export class ScannerPage implements OnInit {
   detectionResults:DetectedQuadResult[] = [];
   showConfirmation = false;
   usingWhiteBackgroundTemplate = false;
+  timesTried = 0;
+  preserveAspectRatio = "";
   constructor(private router: Router) {}
 
   async ngOnInit() {
     await CameraPreview.initialize();
     if (Capacitor.isNativePlatform()) {
+      this.preserveAspectRatio = "xMidYMid slice";
       ScreenOrientation.onChange().subscribe(() => {
         this.updateViewBox(this.frameWidth,this.frameHeight);
       });
@@ -88,13 +91,18 @@ export class ScannerPage implements OnInit {
           frame = result.frame;
           source = frame;
         }
-        if (this.usingWhiteBackgroundTemplate) {
-          console.log("adapt DDN for white background");
-          await this.useDefaultTemplate();
-        }
         results = (await DocumentNormalizer.detect({source:source})).results;
         if (results.length === 0) {
-          await this.useTemplateForWhiteBackground();
+          this.timesTried = this.timesTried + 1;
+        }
+        if (this.timesTried === 8) {
+          if (this.usingWhiteBackgroundTemplate) { 
+            await this.useDefaultTemplate();
+          }else{
+            console.log("adapt DDN for white background");
+            await this.useTemplateForWhiteBackground();
+          }
+          this.timesTried = 0;
         }
         this.drawOverlay(results);
         let ifSteady = this.checkIfSteady(results);
