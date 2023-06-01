@@ -182,7 +182,8 @@ export class ScannerPage implements OnInit {
     console.log(this.photoTaken);
     this.router.navigate(['/cropper'],{
       state: {
-        image: this.photoTaken
+        image: this.photoTaken,
+        detectionResult: this.previousResults[2]
       }
     });
   }

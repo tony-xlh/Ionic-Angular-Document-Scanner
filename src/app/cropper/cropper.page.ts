@@ -43,7 +43,14 @@ export class CropperPage implements OnInit {
               pThis.imgWidth = img.naturalWidth;
               pThis.imgHeight = img.naturalHeight;
               pThis.dataURL = dataUrl;
-              pThis.detect();
+              const detectionResult:DetectedQuadResult|undefined = routeState['detectionResult'];
+              if (detectionResult) {
+                console.log("use detection results from live scan");
+                pThis.detectedQuadResult = detectionResult;
+                pThis.points = pThis.detectedQuadResult.location.points;
+              }else{
+                pThis.detect();
+              }
           }
           img.src = dataUrl;
         }
