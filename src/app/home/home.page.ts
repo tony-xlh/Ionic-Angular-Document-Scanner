@@ -31,16 +31,23 @@ export class HomePage {
     }
   }
   
-  scan(){
+  liveScan(){
+    console.log("scan pressed");
+    if (this.initialized) {
+      this.router.navigate(['/scanner']);
+    }else{
+      alert("Please wait for initialization.");
+    }
+  }
+
+  photoScan(){
     console.log("scan pressed");
     if (this.initialized) {
       this.takePicture();
     }else{
       alert("Please wait for initialization.");
     }
-    
   }
-
 
   async takePicture() {
     const image = await Camera.getPhoto({
@@ -57,7 +64,7 @@ export class HomePage {
       //}
       this.router.navigate(['/cropper'],{
         state: {
-          image: image
+          image: image.dataUrl
         }
       });
     }
@@ -95,7 +102,4 @@ export class HomePage {
       }
     });
   }
-  
-
-
 }

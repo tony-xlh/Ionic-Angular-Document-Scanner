@@ -34,20 +34,18 @@ export class CropperPage implements OnInit {
     if (navigation) {
       const routeState = navigation.extras.state;
       if (routeState) {
-        const image:Photo = routeState['image'];
-        if (image.dataUrl) {
+        const dataUrl:string = routeState['image'];
+        if (dataUrl) {
           const pThis = this;
           let img = new Image();
           img.onload = function(){
-            if (image.dataUrl) {
               pThis.viewBox = "0 0 "+img.naturalWidth+" "+img.naturalHeight;
               pThis.imgWidth = img.naturalWidth;
               pThis.imgHeight = img.naturalHeight;
-              pThis.dataURL = image.dataUrl;
+              pThis.dataURL = dataUrl;
               pThis.detect();
-            }
           }
-          img.src = image.dataUrl;
+          img.src = dataUrl;
         }
       }
     }

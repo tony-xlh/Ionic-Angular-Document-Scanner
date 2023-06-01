@@ -1,0 +1,23 @@
+<div class="scanner">
+  <svg 
+    [attr.viewBox]="viewBox" 
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <polygon
+      *ngFor="let result of detectionResults"
+      [attr.points]="getPointsData(result)"
+      stroke="green"
+      stroke-width="1"
+      fill="lime"
+      opacity="0.3"
+    >
+    </polygon>
+  </svg>
+  <div id="confirmation" *ngIf="showConfirmation">
+    <div>
+      <button (click)="retake()">Retake</button>
+      <button (click)="okay()">Okay</button>
+    </div>
+  </div>
+</div>

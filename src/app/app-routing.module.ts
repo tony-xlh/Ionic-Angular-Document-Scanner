@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'cropper',
     loadChildren: () => import('./cropper/cropper.module').then( m => m.CropperPageModule)
   },
+  {
+    path: 'scanner',
+    loadChildren: () => import('./scanner/scanner.module').then( m => m.ScannerPageModule)
+  },
 ];
 
 @NgModule({
