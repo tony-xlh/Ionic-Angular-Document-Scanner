@@ -86,18 +86,14 @@ export class ScannerPage implements OnInit {
       this.scanning = true;
       let base64;
       let frame;
-      let source;
       try {
         if (Capacitor.isNativePlatform()) {
-          let result = await CameraPreview.takeSnapshot({quality:100});
-          base64 = result.base64;
-          source = base64;
+          results = (await DocumentNormalizer.detectBitmap()).results;
         } else {
           let result = await CameraPreview.takeSnapshot2();
           frame = result.frame;
-          source = frame;
+          results = (await DocumentNormalizer.detect({source:frame})).results;
         }
-        results = (await DocumentNormalizer.detect({source:source})).results;
         if (results.length === 0) {
           this.timesTried = this.timesTried + 1;
         }
@@ -113,8 +109,14 @@ export class ScannerPage implements OnInit {
         this.drawOverlay(results);
         let ifSteady = this.checkIfSteady(results);
         if (ifSteady) {
-          if (!base64 && frame) {
-            base64 = frame.toCanvas().toDataURL("image/jpeg");
+          if (!base64) {
+            if (Capacitor.isNativePlatform()) {
+              base64 = (await CameraPreview.takeSnapshot({quality:100})).base64;
+            }else{
+              if (frame) {
+                base64 = frame.toCanvas().toDataURL("image/jpeg");
+              }
+            }
           }
           this.photoTaken = base64;
           if (!this.photoTaken!.startsWith("data")) {
