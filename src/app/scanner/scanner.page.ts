@@ -200,6 +200,7 @@ export class ScannerPage implements OnInit {
   }
 
   cleanedDetectionResult(result:DetectedQuadResultItem){
+    console.log(result);
     let cleaned:DetectedQuad;
     let points:[Point,Point,Point,Point] = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
     for (let index = 0; index < result.location.points.length; index++) {
