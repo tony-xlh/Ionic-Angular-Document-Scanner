@@ -1,5 +1,13 @@
 <div class="scanner">
   <button class="close-btn" (click)="close()">Close</button>
+  <select class="camera-sel" (change)="switchCamera()" [(ngModel)]="selectedCamera">
+    <option
+      *ngFor="let camera of cameras"
+      [value]="camera"
+    >
+      {{camera}}
+    </option>
+  </select>
   <svg 
     class="overlay"
     #svgElement

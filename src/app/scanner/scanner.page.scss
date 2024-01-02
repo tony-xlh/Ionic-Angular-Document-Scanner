@@ -33,3 +33,13 @@
   width: fit-content;
   z-index: 999;
 }
+
+.camera-sel{
+  position:absolute;
+  top:0;
+  top:env(safe-area-inset-top);
+  left:0;
+  height: 20px;
+  width: fit-content;
+  z-index: 999;
+}

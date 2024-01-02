@@ -4,9 +4,8 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { Photo } from '@capacitor/camera';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
-import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
-import { Point } from "dynamsoft-document-normalizer/dist/types/interface/point";
-import { Quadrilateral } from "dynamsoft-document-normalizer/dist/types/interface/quadrilateral";
+import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer';
+import { Point,Quadrilateral } from 'dynamsoft-core';
 import { Capacitor } from '@capacitor/core';
 import { getCanvasFromDataURL } from '../utils';
 
@@ -18,7 +17,7 @@ import { getCanvasFromDataURL } from '../utils';
 export class CropperPage implements OnInit {
   dataURL:string = "";
   viewBox:string = "0 0 1280 720";
-  detectedQuadResult:DetectedQuadResult|undefined;
+  detectedQuadResult:DetectedQuadResultItem|undefined;
   points:[Point,Point,Point,Point]|undefined;
   selectedIndex: number = -1;
   offset:{x:number,y:number}|undefined;
@@ -43,7 +42,7 @@ export class CropperPage implements OnInit {
               pThis.imgWidth = img.naturalWidth;
               pThis.imgHeight = img.naturalHeight;
               pThis.dataURL = dataUrl;
-              const detectionResult:DetectedQuadResult|undefined = routeState['detectionResult'];
+              const detectionResult:DetectedQuadResultItem|undefined = routeState['detectionResult'];
               if (detectionResult) {
                 console.log("use detection results from live scan");
                 pThis.detectedQuadResult = detectionResult;
@@ -101,9 +100,11 @@ export class CropperPage implements OnInit {
         this.getPoint(100,50),
         this.getPoint(100,100),
         this.getPoint(50,100)]};
-      let defaultQuad:DetectedQuadResult = {
-        location:location,
-        confidenceAsDocumentBoundary:90
+      let defaultQuad:DetectedQuadResultItem = {
+        location: location,
+        confidenceAsDocumentBoundary: 90,
+        type: this.detectedQuadResult!.type,
+        referenceItem: this.detectedQuadResult!.referenceItem
       }
       this.detectedQuadResult = defaultQuad;
       this.points = this.detectedQuadResult.location.points;

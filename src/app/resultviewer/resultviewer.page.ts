@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
+import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
@@ -17,7 +17,8 @@ export class ResultviewerPage implements OnInit {
   normalizedImageDataURL:string = "";
   shareSupported:boolean = true;
   isNative:boolean = false;
-  private detectedQuadResult:DetectedQuadResult|undefined;
+  templateName:string = "NormalizeDocument_Binary"
+  private detectedQuadResult:DetectedQuadResultItem|undefined;
   constructor(private router: Router) { }
 
   ngOnInit() {
@@ -47,12 +48,14 @@ export class ResultviewerPage implements OnInit {
       }else{
         source = await getCanvasFromDataURL(this.dataURL)
       }
-      let normalizedImageResult = await DocumentNormalizer.normalize({source:source,quad:this.detectedQuadResult.location});
-      let data = normalizedImageResult.result.data;
-      if (!data.startsWith("data")) {
-        data = "data:image/jpeg;base64," + data;
+      let normalizedImageResult = await DocumentNormalizer.normalize({source:source,quad:this.detectedQuadResult.location,template:this.templateName,includeBase64:true});
+      let data = normalizedImageResult.result.base64;
+      if (data) {
+        if (!data.startsWith("data")) {
+          data = "data:image/jpeg;base64," + data;
+        }
+        this.normalizedImageDataURL = data;
       }
-      this.normalizedImageDataURL = data;
     }else{
       this.normalizedImageDataURL = this.dataURL;
     }
@@ -60,15 +63,13 @@ export class ResultviewerPage implements OnInit {
 
   async colorModeChanged(event:any){
     console.log(event);
-    let template;
     if (event.target.value === "binary") {
-      template = "{\"GlobalParameter\":{\"Name\":\"GP\",\"MaxTotalImageDimension\":0},\"ImageParameterArray\":[{\"Name\":\"IP-1\",\"NormalizerParameterName\":\"NP-1\",\"BaseImageParameterName\":\"\"}],\"NormalizerParameterArray\":[{\"Name\":\"NP-1\",\"ContentType\":\"CT_DOCUMENT\",\"ColourMode\":\"ICM_BINARY\"}]}";
+      this.templateName = "NormalizeDocument_Binary";
     } else if (event.target.value === "gray") {
-      template = "{\"GlobalParameter\":{\"Name\":\"GP\",\"MaxTotalImageDimension\":0},\"ImageParameterArray\":[{\"Name\":\"IP-1\",\"NormalizerParameterName\":\"NP-1\",\"BaseImageParameterName\":\"\"}],\"NormalizerParameterArray\":[{\"Name\":\"NP-1\",\"ContentType\":\"CT_DOCUMENT\",\"ColourMode\":\"ICM_GRAYSCALE\"}]}";
+      this.templateName = "NormalizeDocument_Gray";
     } else {
-      template = "{\"GlobalParameter\":{\"Name\":\"GP\",\"MaxTotalImageDimension\":0},\"ImageParameterArray\":[{\"Name\":\"IP-1\",\"NormalizerParameterName\":\"NP-1\",\"BaseImageParameterName\":\"\"}],\"NormalizerParameterArray\":[{\"Name\":\"NP-1\",\"ContentType\":\"CT_DOCUMENT\",\"ColourMode\":\"ICM_COLOUR\"}]}";
+      this.templateName = "NormalizeDocument_Color";
     }
-    await DocumentNormalizer.initRuntimeSettingsFromString({template:template});
     await this.normalize();
   }
 

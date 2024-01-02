@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Capacitor, PluginListenerHandle } from '@capacitor/core';
-import { CameraPreview, EnumResolution } from 'capacitor-plugin-dynamsoft-camera-preview';
+import { CameraPreview, EnumResolution } from 'capacitor-plugin-camera';
 import { DocumentNormalizer, intersectionOverUnion } from 'capacitor-plugin-dynamsoft-document-normalizer';
-import { DetectedQuadResult } from 'dynamsoft-document-normalizer';
-import { ScreenOrientation } from "@awesome-cordova-plugins/screen-orientation";
+import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer';
 import { Router } from '@angular/router';
+import { DetectedQuad, Point, Quadrilateral } from '../definitions';
 
 @Component({
   selector: 'app-scanner',
@@ -12,44 +12,51 @@ import { Router } from '@angular/router';
   styleUrls: ['./scanner.page.scss'],
 })
 export class ScannerPage implements OnInit {
+  onOrientationChangedListener:PluginListenerHandle|undefined;
   onPlayedListener:PluginListenerHandle|undefined;
   frameWidth:number = 1280;
   frameHeight:number = 720;
   viewBox:string = "0 0 1280 720";
+  canvasForDetection = document.createElement("canvas");
+  canvasForFullFrame:HTMLCanvasElement = document.createElement("canvas");
   interval:any;
   photoTaken:string|undefined;
+  cameras:string[] = [];
+  selectedCamera:string = "";
   scanning = false;
-  previousResults:DetectedQuadResult[] = [];
-  detectionResults:DetectedQuadResult[] = [];
+  previousResults:DetectedQuadResultItem[] = [];
+  detectionResults:DetectedQuadResultItem[] = [];
   showConfirmation = false;
   usingWhiteBackgroundTemplate = false;
-  timesTried = 0;
-  preserveAspectRatio = "";
+  preserveAspectRatio = "xMidYMid slice";
   constructor(private router: Router) {}
 
   async ngOnInit() {
     await CameraPreview.initialize();
-    if (Capacitor.isNativePlatform()) {
-      this.preserveAspectRatio = "xMidYMid slice";
-      ScreenOrientation.onChange().subscribe(() => {
-        this.updateViewBox(this.frameWidth,this.frameHeight);
-      });
+
+    if (this.onOrientationChangedListener) {
+      await this.onOrientationChangedListener.remove();
     }
     if (this.onPlayedListener) {
       await this.onPlayedListener.remove();
     }
+    this.onOrientationChangedListener = await CameraPreview.addListener('onOrientationChanged', () => {
+      this.updateViewBox(this.frameWidth,this.frameHeight);
+    });
     this.onPlayedListener = await CameraPreview.addListener('onPlayed', async (res) => {
+      this.selectedCamera = (await CameraPreview.getSelectedCamera()).selectedCamera;
       let width = res.resolution.split("x")[0];
       let height = res.resolution.split("x")[1];
       this.frameWidth = parseInt(width);
       this.frameHeight = parseInt(height);
       this.updateViewBox(this.frameWidth,this.frameHeight);
+      this.startScanning();
     });
     
     await CameraPreview.requestCameraPermission();
+    this.cameras = (await CameraPreview.getAllCameras()).cameras;
     await CameraPreview.setResolution({resolution:EnumResolution.RESOLUTION_1080P});
     await CameraPreview.startCamera();
-    this.startScanning();
   }
 
   async ngOnDestroy() {
@@ -58,19 +65,8 @@ export class ScannerPage implements OnInit {
     await CameraPreview.stopCamera();
   }
 
-  async useDefaultTemplate(){
-    //default template
-    const template = "{\"GlobalParameter\": {\"MaxTotalImageDimension\": 0,\"Name\": \"DM_Defaut_GlobalParameter\"},\"ImageParameterArray\": [{\"BaseImageParameterName\": \"\",\"BinarizationModes\": [{\"BlockSizeX\": 0,\"BlockSizeY\": 0,\"EnableFillBinaryVacancy\": 0,\"GrayscaleEnhancementModesIndex\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"BM_LOCAL_BLOCK\",\"MorphOperation\": \"Erode\",\"MorphOperationKernelSizeX\": -1,\"MorphOperationKernelSizeY\": -1,\"MorphShape\": \"Rectangle\",\"ThresholdCompensation\": 7}],\"ColourChannelUsageType\": \"CCUT_AUTO\",\"ColourConversionModes\": [{\"BlueChannelWeight\": -1,\"GreenChannelWeight\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"CICM_GENERAL\",\"RedChannelWeight\": -1}],\"GrayscaleEnhancementModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GEM_GENERAL\"}],\"GrayscaleTransformationModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GTM_ORIGINAL\"}],\"LineExtractionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"LEM_GENERAL\"}],\"MaxThreadCount\": 4,\"Name\": \"DM_Defaut_ImageParameter\",\"NormalizerParameterName\": \"DM_Default_NormalizerParameter\",\"RegionPredetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"RPM_GENERAL\"}],\"ScaleDownThreshold\": 512,\"TextFilterModes\": [{\"IfEraseTextZone\": 0,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"MinImageDimension\": 65536,\"Mode\": \"TFM_GENERAL_CONTOUR\",\"Sensitivity\": 0}],\"TextureDetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"TDM_GENERAL_WIDTH_CONCENTRATION\",\"Sensitivity\": 5}],\"Timeout\": 10000}],\"NormalizerParameterArray\": [{\"Brightness\": 0,\"ColourMode\": \"ICM_COLOUR\",\"ContentType\": \"CT_DOCUMENT\",\"Contrast\": 0,\"DeskewMode\": {\"ContentDirection\": 0,\"Mode\": \"DM_PERSPECTIVE_CORRECTION\"},\"InteriorAngleRangeArray\": [{\"MaxValue\": 110,\"MinValue\": 70}],\"Name\": \"DM_Default_NormalizerParameter\",\"PageSize\": [-1,-1],\"QuadrilateralDetectionModes\": [{\"Mode\": \"QDM_GENERAL\"}]}]}";
-    await DocumentNormalizer.initRuntimeSettingsFromString({template:template});
-  }
-
-  async useTemplateForWhiteBackground(){
-    //template for white background
-    const template = "{\"GlobalParameter\": {\"MaxTotalImageDimension\": 0,\"Name\": \"DM_Defaut_GlobalParameter\"},\"ImageParameterArray\": [{\"BaseImageParameterName\": \"\",\"BinarizationModes\": [{\"BlockSizeX\": 7,\"BlockSizeY\": 7,\"EnableFillBinaryVacancy\": 0,\"GrayscaleEnhancementModesIndex\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"BM_LOCAL_BLOCK\",\"MorphOperation\": \"Close\",\"MorphOperationKernelSizeX\": 3,\"MorphOperationKernelSizeY\": 3,\"MorphShape\": \"Rectangle\",\"ThresholdCompensation\": 5}],\"ColourChannelUsageType\": \"CCUT_AUTO\",\"ColourConversionModes\": [{\"BlueChannelWeight\": -1,\"GreenChannelWeight\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"CICM_GENERAL\",\"RedChannelWeight\": -1}],\"GrayscaleEnhancementModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GEM_SHARPEN_SMOOTH\",\"SharpenBlockSizeX\": 3,\"SharpenBlockSizeY\": 3,\"SmoothBlockSizeX\": 3,\"SmoothBlockSizeY\": 3}],\"GrayscaleTransformationModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GTM_ORIGINAL\"}],\"LineExtractionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"LEM_GENERAL\"}],\"MaxThreadCount\": 4,\"Name\": \"DM_Defaut_ImageParameter\",\"NormalizerParameterName\": \"NormalizerParameter\",\"RegionPredetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"RPM_GENERAL\"}],\"ScaleDownThreshold\": 512,\"TextFilterModes\": [{\"IfEraseTextZone\": 0,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"MinImageDimension\": 65536,\"Mode\": \"TFM_GENERAL_CONTOUR\",\"Sensitivity\": 0}],\"TextureDetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"TDM_GENERAL_WIDTH_CONCENTRATION\",\"Sensitivity\": 5}],\"Timeout\": 10000}],\"NormalizerParameterArray\": [{\"Brightness\": 0,\"ColourMode\": \"ICM_COLOUR\",\"ContentType\": \"CT_DOCUMENT\",\"Contrast\": 0,\"DeskewMode\": {\"ContentDirection\": 0,\"Mode\": \"DM_PERSPECTIVE_CORRECTION\"},\"InteriorAngleRangeArray\": [{\"MaxValue\": 110,\"MinValue\": 70}],\"Name\": \"NormalizerParameter\",\"PageSize\": [-1,-1],\"QuadrilateralDetectionModes\": [{\"Mode\": \"QDM_GENERAL\"}]}]}";
-    await DocumentNormalizer.initRuntimeSettingsFromString({template:template});
-  }
-
   startScanning(){
+    this.stopScanning();
     this.photoTaken = undefined;
     this.previousResults = [];
     this.scanning = false;
@@ -82,41 +78,31 @@ export class ScannerPage implements OnInit {
       if (this.photoTaken) {
         return;
       }
-      let results:DetectedQuadResult[] = [];
+      let results:DetectedQuadResultItem[] = [];
       this.scanning = true;
       let base64;
-      let frame;
+      let scaleRatio = 1.0;
       try {
         if (Capacitor.isNativePlatform()) {
-          results = (await DocumentNormalizer.detectBitmap()).results;
+          results = (await DocumentNormalizer.detectBitmap({})).results;
         } else {
-          let result = await CameraPreview.takeSnapshot2();
-          frame = result.frame;
-          results = (await DocumentNormalizer.detect({source:frame})).results;
+          let snapshotResult = await CameraPreview.takeSnapshot2({canvas:this.canvasForDetection,maxLength:1280});
+          if (snapshotResult.scaleRatio) {
+            scaleRatio = snapshotResult.scaleRatio;
+          };
+          results = (await DocumentNormalizer.detect({source:this.canvasForDetection})).results;
         }
-        if (results.length === 0) {
-          this.timesTried = this.timesTried + 1;
-        }
-        if (this.timesTried === 8) {
-          if (this.usingWhiteBackgroundTemplate) { 
-            await this.useDefaultTemplate();
-          }else{
-            console.log("adapt DDN for white background");
-            await this.useTemplateForWhiteBackground();
-          }
-          this.timesTried = 0;
+        if (scaleRatio != 1.0) {
+          this.scaleResults(results,scaleRatio,scaleRatio);
         }
         this.drawOverlay(results);
         let ifSteady = this.checkIfSteady(results);
         if (ifSteady) {
-          if (!base64) {
-            if (Capacitor.isNativePlatform()) {
-              base64 = (await CameraPreview.takeSnapshot({quality:100})).base64;
-            }else{
-              if (frame) {
-                base64 = frame.toCanvas().toDataURL("image/jpeg");
-              }
-            }
+          if (Capacitor.isNativePlatform()) {
+            base64 = (await CameraPreview.takeSnapshot({quality:100})).base64;
+          }else{
+            await CameraPreview.takeSnapshot2({canvas:this.canvasForFullFrame});
+            base64 = this.canvasForFullFrame.toDataURL("image/jpeg");
           }
           this.photoTaken = base64;
           if (!this.photoTaken!.startsWith("data")) {
@@ -125,7 +111,6 @@ export class ScannerPage implements OnInit {
           this.stopScanning();
           this.showConfirmation = true;
         }
-        
       } catch (error) {
         console.log(error);
       }
@@ -140,7 +125,7 @@ export class ScannerPage implements OnInit {
     this.scanning = false;
   }
 
-  checkIfSteady(results:DetectedQuadResult[]) {
+  checkIfSteady(results:DetectedQuadResultItem[]) {
     if (results.length>0) {
       let result = results[0];
       if (this.previousResults.length >= 3) {
@@ -177,8 +162,27 @@ export class ScannerPage implements OnInit {
     return false;
   }
 
-  drawOverlay(results:DetectedQuadResult[]){
+  drawOverlay(results:DetectedQuadResultItem[]){
     this.detectionResults = results;
+  }
+
+  scaleResults(results:DetectedQuadResultItem[],scaleX:number,scaleY:number){
+    for (let index = 0; index < results.length; index++) {
+      const result = results[index];
+      this.scaleResult(result,scaleX,scaleY);
+    }
+  }
+
+  scaleResult(result:DetectedQuadResultItem,scaleX:number,scaleY:number){
+    let location = result.location;
+    location.points[0].x = location.points[0].x/scaleX;
+    location.points[1].x = location.points[1].x/scaleX;
+    location.points[2].x = location.points[2].x/scaleX;
+    location.points[3].x = location.points[3].x/scaleX;
+    location.points[0].y = location.points[0].y/scaleY;
+    location.points[1].y = location.points[1].y/scaleY;
+    location.points[2].y = location.points[2].y/scaleY;
+    location.points[3].y = location.points[3].y/scaleY;
   }
 
   retake(){
@@ -190,12 +194,27 @@ export class ScannerPage implements OnInit {
     this.router.navigate(['/cropper'],{
       state: {
         image: this.photoTaken,
-        detectionResult: this.detectionResults[0]
+        detectionResult: this.cleanedDetectionResult(this.detectionResults[0])
       }
     });
   }
 
-  getPointsData(result:DetectedQuadResult){
+  cleanedDetectionResult(result:DetectedQuadResultItem){
+    let cleaned:DetectedQuad;
+    let points:[Point,Point,Point,Point] = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+    for (let index = 0; index < result.location.points.length; index++) {
+      const p = result.location.points[index];
+      points[index].x = p.x;
+      points[index].y = p.y;
+    }
+    cleaned = {
+      location:{points:points},
+      confidenceAsDocumentBoundary:result.confidenceAsDocumentBoundary
+    }
+    return cleaned;
+  }
+
+  getPointsData(result:DetectedQuadResultItem){
     let location = result.location;
     let pointsData = location.points[0].x + "," + location.points[0].y + " ";
     pointsData = pointsData + location.points[1].x + "," + location.points[1].y +" ";
@@ -204,9 +223,10 @@ export class ScannerPage implements OnInit {
     return pointsData;
   }
 
-  updateViewBox(width:number, height:number){
+  async updateViewBox(width:number, height:number){
     if (Capacitor.isNativePlatform()) {
-      if (ScreenOrientation.type.toLowerCase().indexOf("portrait") != -1) {
+      let orientation = (await CameraPreview.getOrientation()).orientation;
+      if (orientation === "PORTRAIT") {
         console.log("switch width and height");
         let temp = width;
         width = height;
@@ -224,5 +244,10 @@ export class ScannerPage implements OnInit {
 
   close(){
     this.router.navigate(['/home']);
+  }
+
+  async switchCamera(){
+    this.stopScanning();
+    await CameraPreview.selectCamera({cameraID:this.selectedCamera});
   }
 }
