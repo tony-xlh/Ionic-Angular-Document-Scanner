@@ -7,7 +7,7 @@ import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normaliz
 import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer';
 import { Point,Quadrilateral } from 'dynamsoft-core';
 import { Capacitor } from '@capacitor/core';
-import { getCanvasFromDataURL } from '../utils';
+import { cleanedDetectionResult, getCanvasFromDataURL } from '../utils';
 
 @Component({
   selector: 'app-cropper',
@@ -57,18 +57,6 @@ export class CropperPage implements OnInit {
     }
   }
 
-  async useDefaultTemplate(){
-    //default template
-    const template = "{\"GlobalParameter\": {\"MaxTotalImageDimension\": 0,\"Name\": \"DM_Defaut_GlobalParameter\"},\"ImageParameterArray\": [{\"BaseImageParameterName\": \"\",\"BinarizationModes\": [{\"BlockSizeX\": 0,\"BlockSizeY\": 0,\"EnableFillBinaryVacancy\": 0,\"GrayscaleEnhancementModesIndex\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"BM_LOCAL_BLOCK\",\"MorphOperation\": \"Erode\",\"MorphOperationKernelSizeX\": -1,\"MorphOperationKernelSizeY\": -1,\"MorphShape\": \"Rectangle\",\"ThresholdCompensation\": 7}],\"ColourChannelUsageType\": \"CCUT_AUTO\",\"ColourConversionModes\": [{\"BlueChannelWeight\": -1,\"GreenChannelWeight\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"CICM_GENERAL\",\"RedChannelWeight\": -1}],\"GrayscaleEnhancementModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GEM_GENERAL\"}],\"GrayscaleTransformationModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GTM_ORIGINAL\"}],\"LineExtractionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"LEM_GENERAL\"}],\"MaxThreadCount\": 4,\"Name\": \"DM_Defaut_ImageParameter\",\"NormalizerParameterName\": \"DM_Default_NormalizerParameter\",\"RegionPredetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"RPM_GENERAL\"}],\"ScaleDownThreshold\": 512,\"TextFilterModes\": [{\"IfEraseTextZone\": 0,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"MinImageDimension\": 65536,\"Mode\": \"TFM_GENERAL_CONTOUR\",\"Sensitivity\": 0}],\"TextureDetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"TDM_GENERAL_WIDTH_CONCENTRATION\",\"Sensitivity\": 5}],\"Timeout\": 10000}],\"NormalizerParameterArray\": [{\"Brightness\": 0,\"ColourMode\": \"ICM_COLOUR\",\"ContentType\": \"CT_DOCUMENT\",\"Contrast\": 0,\"DeskewMode\": {\"ContentDirection\": 0,\"Mode\": \"DM_PERSPECTIVE_CORRECTION\"},\"InteriorAngleRangeArray\": [{\"MaxValue\": 110,\"MinValue\": 70}],\"Name\": \"DM_Default_NormalizerParameter\",\"PageSize\": [-1,-1],\"QuadrilateralDetectionModes\": [{\"Mode\": \"QDM_GENERAL\"}]}]}";
-    await DocumentNormalizer.initRuntimeSettingsFromString({template:template});
-  }
-
-  async useTemplateForWhiteBackground(){
-    //template for white background
-    const template = "{\"GlobalParameter\": {\"MaxTotalImageDimension\": 0,\"Name\": \"DM_Defaut_GlobalParameter\"},\"ImageParameterArray\": [{\"BaseImageParameterName\": \"\",\"BinarizationModes\": [{\"BlockSizeX\": 7,\"BlockSizeY\": 7,\"EnableFillBinaryVacancy\": 0,\"GrayscaleEnhancementModesIndex\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"BM_LOCAL_BLOCK\",\"MorphOperation\": \"Close\",\"MorphOperationKernelSizeX\": 3,\"MorphOperationKernelSizeY\": 3,\"MorphShape\": \"Rectangle\",\"ThresholdCompensation\": 5}],\"ColourChannelUsageType\": \"CCUT_AUTO\",\"ColourConversionModes\": [{\"BlueChannelWeight\": -1,\"GreenChannelWeight\": -1,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"CICM_GENERAL\",\"RedChannelWeight\": -1}],\"GrayscaleEnhancementModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GEM_SHARPEN_SMOOTH\",\"SharpenBlockSizeX\": 3,\"SharpenBlockSizeY\": 3,\"SmoothBlockSizeX\": 3,\"SmoothBlockSizeY\": 3}],\"GrayscaleTransformationModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"GTM_ORIGINAL\"}],\"LineExtractionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"LEM_GENERAL\"}],\"MaxThreadCount\": 4,\"Name\": \"DM_Defaut_ImageParameter\",\"NormalizerParameterName\": \"NormalizerParameter\",\"RegionPredetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"RPM_GENERAL\"}],\"ScaleDownThreshold\": 512,\"TextFilterModes\": [{\"IfEraseTextZone\": 0,\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"MinImageDimension\": 65536,\"Mode\": \"TFM_GENERAL_CONTOUR\",\"Sensitivity\": 0}],\"TextureDetectionModes\": [{\"LibraryFileName\": \"\",\"LibraryParameters\": \"\",\"Mode\": \"TDM_GENERAL_WIDTH_CONCENTRATION\",\"Sensitivity\": 5}],\"Timeout\": 10000}],\"NormalizerParameterArray\": [{\"Brightness\": 0,\"ColourMode\": \"ICM_COLOUR\",\"ContentType\": \"CT_DOCUMENT\",\"Contrast\": 0,\"DeskewMode\": {\"ContentDirection\": 0,\"Mode\": \"DM_PERSPECTIVE_CORRECTION\"},\"InteriorAngleRangeArray\": [{\"MaxValue\": 110,\"MinValue\": 70}],\"Name\": \"NormalizerParameter\",\"PageSize\": [-1,-1],\"QuadrilateralDetectionModes\": [{\"Mode\": \"QDM_GENERAL\"}]}]}";
-    await DocumentNormalizer.initRuntimeSettingsFromString({template:template});
-  }
-
   getSVGWidth(svgElement:any){
     let imgRatio = this.imgWidth/this.imgHeight;
     let width = svgElement.clientHeight * imgRatio;
@@ -76,7 +64,6 @@ export class CropperPage implements OnInit {
   }
 
   async detect(){
-    await this.useDefaultTemplate();
     let source;
     if (Capacitor.isNativePlatform()) {
       source = this.dataURL;
@@ -84,11 +71,6 @@ export class CropperPage implements OnInit {
       source = await getCanvasFromDataURL(this.dataURL)
     }
     let results = (await DocumentNormalizer.detect({source:source})).results;
-    if (results.length === 0) {
-      console.log("adapt DDN for white background");
-      await this.useTemplateForWhiteBackground();
-      results = (await DocumentNormalizer.detect({source:source})).results;
-    }
     if (results.length>0) {
       console.log(results);
       this.detectedQuadResult = results[0];
@@ -261,7 +243,7 @@ export class CropperPage implements OnInit {
   use(){
     this.router.navigate(['/resultviewer'],{
       state: {
-        detectedQuadResult: this.detectedQuadResult,
+        detectedQuadResult: cleanedDetectionResult(this.detectedQuadResult!),
         dataURL: this.dataURL,
       }
     });

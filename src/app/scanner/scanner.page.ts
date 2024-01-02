@@ -4,7 +4,7 @@ import { CameraPreview, EnumResolution } from 'capacitor-plugin-camera';
 import { DocumentNormalizer, intersectionOverUnion } from 'capacitor-plugin-dynamsoft-document-normalizer';
 import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer';
 import { Router } from '@angular/router';
-import { DetectedQuad, Point, Quadrilateral } from '../definitions';
+import { cleanedDetectionResult } from '../utils';
 
 @Component({
   selector: 'app-scanner',
@@ -84,6 +84,7 @@ export class ScannerPage implements OnInit {
       let scaleRatio = 1.0;
       try {
         if (Capacitor.isNativePlatform()) {
+          await CameraPreview.saveFrame();
           results = (await DocumentNormalizer.detectBitmap({})).results;
         } else {
           let snapshotResult = await CameraPreview.takeSnapshot2({canvas:this.canvasForDetection,maxLength:1280});
@@ -109,6 +110,7 @@ export class ScannerPage implements OnInit {
             this.photoTaken = "data:image/jpeg;base64," + this.photoTaken;
           }
           this.stopScanning();
+          console.log("showConfirmation");
           this.showConfirmation = true;
         }
       } catch (error) {
@@ -194,26 +196,12 @@ export class ScannerPage implements OnInit {
     this.router.navigate(['/cropper'],{
       state: {
         image: this.photoTaken,
-        detectionResult: this.cleanedDetectionResult(this.detectionResults[0])
+        detectionResult: cleanedDetectionResult(this.detectionResults[0])
       }
     });
   }
 
-  cleanedDetectionResult(result:DetectedQuadResultItem){
-    console.log(result);
-    let cleaned:DetectedQuad;
-    let points:[Point,Point,Point,Point] = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
-    for (let index = 0; index < result.location.points.length; index++) {
-      const p = result.location.points[index];
-      points[index].x = p.x;
-      points[index].y = p.y;
-    }
-    cleaned = {
-      location:{points:points},
-      confidenceAsDocumentBoundary:result.confidenceAsDocumentBoundary
-    }
-    return cleaned;
-  }
+  
 
   getPointsData(result:DetectedQuadResultItem){
     let location = result.location;
