@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 import { CameraPreview, EnumResolution } from 'capacitor-plugin-camera';
 import { DocumentNormalizer, intersectionOverUnion } from 'capacitor-plugin-dynamsoft-document-normalizer';
@@ -29,7 +29,7 @@ export class ScannerPage implements OnInit {
   showConfirmation = false;
   usingWhiteBackgroundTemplate = false;
   preserveAspectRatio = "xMidYMid slice";
-  constructor(private router: Router) {}
+  constructor(private router: Router,private ref:ChangeDetectorRef) {}
 
   async ngOnInit() {
     await CameraPreview.initialize();
@@ -92,6 +92,7 @@ export class ScannerPage implements OnInit {
             scaleRatio = snapshotResult.scaleRatio;
           };
           results = (await DocumentNormalizer.detect({source:this.canvasForDetection})).results;
+          
         }
         if (scaleRatio != 1.0) {
           this.scaleResults(results,scaleRatio,scaleRatio);
@@ -112,6 +113,8 @@ export class ScannerPage implements OnInit {
           this.stopScanning();
           console.log("showConfirmation");
           this.showConfirmation = true;
+          this.ref.markForCheck();
+          this.ref.detectChanges();
         }
       } catch (error) {
         console.log(error);
@@ -166,6 +169,8 @@ export class ScannerPage implements OnInit {
 
   drawOverlay(results:DetectedQuadResultItem[]){
     this.detectionResults = results;
+    this.ref.markForCheck();
+    this.ref.detectChanges();
   }
 
   scaleResults(results:DetectedQuadResultItem[],scaleX:number,scaleY:number){
