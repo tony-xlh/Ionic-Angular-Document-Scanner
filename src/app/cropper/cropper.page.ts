@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Location } from "@angular/common";
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
@@ -25,7 +25,7 @@ export class CropperPage implements OnInit {
   private imgHeight:number = 0;
   isTouchDevice:boolean = false;
   private usingTouchEvent:boolean = false;
-  constructor(private router: Router,private location: Location,private toastController: ToastController) {}
+  constructor(private router: Router,private location: Location,private toastController: ToastController,private ref:ChangeDetectorRef) {}
 
   ngOnInit() {
     this.isTouchDevice = 'ontouchstart' in document.documentElement;
@@ -220,6 +220,8 @@ export class CropperPage implements OnInit {
         this.detectedQuadResult.location.points[this.selectedIndex].y = point.y;
       }
     }
+    this.ref.markForCheck();
+    this.ref.detectChanges();
   }
 
   //Convert the screen coordinates to the SVG's coordinates from https://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/

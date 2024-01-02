@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DetectedQuadResultItem } from 'dynamsoft-document-normalizer';
 import { DocumentNormalizer } from 'capacitor-plugin-dynamsoft-document-normalizer';
@@ -19,7 +19,7 @@ export class ResultviewerPage implements OnInit {
   isNative:boolean = false;
   templateName:string = "NormalizeDocument_Binary"
   private detectedQuadResult:DetectedQuadResultItem|undefined;
-  constructor(private router: Router) { }
+  constructor(private router: Router,private ref:ChangeDetectorRef) { }
 
   ngOnInit() {
     this.isNative = Capacitor.isNativePlatform();
@@ -59,6 +59,8 @@ export class ResultviewerPage implements OnInit {
     }else{
       this.normalizedImageDataURL = this.dataURL;
     }
+    this.ref.markForCheck();
+    this.ref.detectChanges();
   }
 
   async colorModeChanged(event:any){
